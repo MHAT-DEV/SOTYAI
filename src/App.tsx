@@ -56,19 +56,42 @@ export default function App() {
   useEffect(() => {
     // Load identities
     fetch('/api/identities')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch identities');
+        return res.json();
+      })
       .then(data => {
-        setIdentities(data);
-        if (data.length > 0) setCurrentIdentity(data[0]);
+        if (Array.isArray(data)) {
+          setIdentities(data);
+          if (data.length > 0) setCurrentIdentity(data[0]);
+        } else {
+          console.error('Invalid identities data:', data);
+          setIdentities([]);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching identities:', err);
+        setIdentities([]);
       });
 
     // Load knowledge for quick header search index
     fetch('/api/knowledge')
-      .then(res => res.json())
-      .then(data => {
-        setKnowledgeIndex(data);
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch knowledge');
+        return res.json();
       })
-      .catch(err => console.error('Error fetching search index:', err));
+      .then(data => {
+        if (Array.isArray(data)) {
+          setKnowledgeIndex(data);
+        } else {
+          console.error('Invalid knowledge data:', data);
+          setKnowledgeIndex([]);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching search index:', err);
+        setKnowledgeIndex([]);
+      });
   }, []);
 
   useEffect(() => {
@@ -76,7 +99,10 @@ export default function App() {
 
     const fetchUnreadCount = () => {
       fetch(`/api/messages/unread-count/${currentIdentity.id}`)
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch unread count');
+          return res.json();
+        })
         .then(data => {
           if (data && typeof data.unreadCount === 'number') {
             setUnreadCount(data.unreadCount);

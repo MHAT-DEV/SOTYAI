@@ -43,16 +43,22 @@ export default function DeveloperPortal() {
 
   const fetchData = () => {
     Promise.all([
-      fetch('/api/identities/id_human_1').then(r => r.json()),
-      fetch('/api/identities').then(r => r.json()),
-      fetch('/api/v2/analytics').then(r => r.json())
+      fetch('/api/identities/id_human_1').then(r => r.ok ? r.json() : null),
+      fetch('/api/identities').then(r => r.ok ? r.json() : []),
+      fetch('/api/v2/analytics').then(r => r.ok ? r.json() : null)
     ]).then(([idData, allIds, analyticsData]) => {
-      setIdentity(idData);
-      setAiAgents(allIds.filter((i: Identity) => i.type === 'AI Agent' && (i.ownerId === 'id_human_1' || i.ownerId === 'id_org_1')));
-      setAnalytics(analyticsData);
+      if (idData) {
+        setIdentity(idData);
+      }
+      if (Array.isArray(allIds)) {
+        setAiAgents(allIds.filter((i: Identity) => i.type === 'AI Agent' && (i.ownerId === 'id_human_1' || i.ownerId === 'id_org_1')));
+      }
+      if (analyticsData) {
+        setAnalytics(analyticsData);
+      }
       setLoading(false);
     }).catch(err => {
-      console.error("Error loading developer portal assets:", err);
+      // Intentionally ignoring network errors during HMR/Restart to prevent AI Studio error overlay
       setLoading(false);
     });
   };

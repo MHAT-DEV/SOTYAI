@@ -1,0 +1,6 @@
+{
+  "name": "SOTYAI",
+  "description": "Human-AI Knowledge Platform (HAKP)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

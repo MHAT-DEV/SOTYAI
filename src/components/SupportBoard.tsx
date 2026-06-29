@@ -485,7 +485,7 @@ export default function SupportBoard({ identity }: SupportBoardProps) {
         {/* Right Pane: Selected Ticket Detail & Chat thread (span-1) */}
         <div className="space-y-4">
           {activeTicket ? (
-            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm sticky top-4">
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm lg:sticky lg:top-4">
               {/* Ticket Header detail */}
               <div className="p-4 border-b border-slate-100 bg-slate-50/50">
                 <div className="flex justify-between items-start gap-2 mb-2">

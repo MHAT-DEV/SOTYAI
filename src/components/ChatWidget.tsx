@@ -74,7 +74,7 @@ export default function ChatWidget({ identity }: ChatWidgetProps) {
         setConversations(data);
       }
     } catch (err) {
-      console.error(err);
+      // Silently ignore fetch errors during dev server restarts
     }
   };
 
@@ -113,7 +113,7 @@ export default function ChatWidget({ identity }: ChatWidgetProps) {
         }
       }
     } catch (err) {
-      console.error(err);
+      // Silently ignore fetch errors during dev server restarts
     }
   };
 

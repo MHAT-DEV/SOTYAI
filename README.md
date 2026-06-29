@@ -8,12 +8,41 @@
 
 ระบบมีฟีเจอร์เด่นทั้งในด้านการตรวจสอบความถูกต้องโดย AI, การจัดการ API V2 สำหรับนักพัฒนา (Developer Portal), การทำงานประสานกันผ่าน Model Context Protocol (MCP) และระบบผู้ช่วย AI แบบ Full-stack
 
-## 🎯 วัตถุประสงค์ (Objectives)
+## 🧠 Knowledge Debate System
+SOTYAI introduces a structured Knowledge Comparison Engine that enables:
+- Knowledge vs Knowledge comparison (A vs B)
+- Multi-dimensional evaluation (performance, reliability, usability, ecosystem, cost, popularity, industry fit)
+- Evidence-based scoring instead of opinion-based debate
+- Context-aware outcomes (results depend on use case and environment)
+
+### Key Principle
+This system does NOT produce a single winner. Instead, it explains:
+- which knowledge performs better in each dimension
+- under which context each is more suitable
+- why real-world adoption may differ from technical superiority
+
+### Popularity is NOT sentiment
+Popularity is treated as a structural signal derived from:
+- adoption rate
+- ecosystem dependency
+- legacy usage
+- real-world constraints
+It is not based on opinion or emotional feedback.
+
+### Philosophy Update
+SOTYAI does not assume one absolute truth. Instead, it models knowledge as a multi-dimensional system where:
+- technical correctness
+- real-world adoption
+- human behavior
+- and constraints coexist without overriding each other.
+
+## 🎯 วัตถุประสงค์ (Objectives & Key Features)
 
 1. **สร้างองค์ความรู้ที่ทำงานร่วมกันได้ (Human-AI Collaboration):** สร้างพื้นที่ให้มนุษย์และ AI สามารถเขียน อ่าน อ้างอิง และตรวจสอบองค์ความรู้ร่วมกัน
-2. **ความน่าเชื่อถือระดับสูงสุด (Verifiable Knowledge):** ตรวจสอบความถูกต้องของข้อมูลทุกชิ้นก่อนนำเข้าสู่ Knowledge Graph
-3. **รองรับการต่อยอดสำหรับนักพัฒนา (Developer Friendly):** มี API V2, Webhooks, และ MCP Tools ที่พร้อมให้ AI Agent ตัวอื่นๆ ดึงข้อมูลไปใช้งานได้อย่างมีประสิทธิภาพ
-4. **ส่วนต่อประสานที่ใช้งานง่าย (Responsive UI):** นำเสนอข้อมูลที่ซับซ้อนด้วย UI/UX ที่เรียบง่าย รองรับทั้งบน Desktop และ Mobile อย่างสมบูรณ์แบบ
+2. **ประวัติการแก้ไของค์ความรู้ (Knowledge Version Control):** ทุกการแก้ไขความรู้จะถูกบันทึกเป็นประวัติเวอร์ชัน (History Event) อย่างชัดเจนเหมือน Git ทำให้ตรวจสอบวิวัฒนาการและย้อนกลับเวอร์ชันได้ตลอดเวลา ปราศจากการเขียนทับ (No Overwrite)
+3. **ระบบทดสอบความรู้แบบชั่วคราว (Ephemeral Sandbox & Queue System):** โค้ดและโมเดลความรู้จะถูกรันใน Sandbox ชั่วคราว (Run → Verify → Destroy) ควบคุมด้วย Queue System เพื่อสร้างหลักฐานความน่าเชื่อถือก่อนอนุมัติเข้า Knowledge Graph โดยไม่มีการรันโค้ดประสงค์ร้ายในระบบหลัก
+4. **ความน่าเชื่อถือระดับสูงสุด (Verifiable Knowledge):** ตรวจสอบความถูกต้องของข้อมูลทุกชิ้นก่อนนำเข้าสู่ระบบผ่านการลงมติจากผู้เชี่ยวชาญและ AI
+5. **รองรับการต่อยอดสำหรับนักพัฒนา (Developer Friendly):** มี API V2, Webhooks, และ MCP Tools ที่พร้อมให้ AI Agent ดึงข้อมูลไปใช้งานได้อย่างมีประสิทธิภาพ
 
 ## 🛠 เทคโนโลยีที่ใช้ (Technologies Used)
 

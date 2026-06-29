@@ -1,4 +1,4 @@
-import { KnowledgeObject, Identity, ActivityEvent, Account, Session, SpaceMember, SpacePost, SpaceComment, SpaceChatMessage, Report, CommunityVerificationRecord, Ticket, TicketComment, Challenge, ChallengeSubmission, TrendingGuide, KnowledgeHistoryEvent } from '../types.js';
+import { KnowledgeObject, Identity, ActivityEvent, Account, Session, SpaceMember, SpacePost, SpaceComment, SpaceChatMessage, Report, CommunityVerificationRecord, Ticket, TicketComment, Challenge, ChallengeSubmission, TrendingGuide, KnowledgeHistoryEvent, Debate, DebateContext, DebateResult } from '../types.js';
 
 let knowledgeStore: KnowledgeObject[] = [];
 let identityStore: Identity[] = [];
@@ -14,6 +14,7 @@ let verificationRecords: CommunityVerificationRecord[] = [];
 let challengeStore: Challenge[] = [];
 let trendingGuideStore: TrendingGuide[] = [];
 let knowledgeHistoryStore: KnowledgeHistoryEvent[] = [];
+let debateStore: Debate[] = [];
 
 let ticketStore: Ticket[] = [
   {
@@ -905,6 +906,24 @@ export function createIdentity(data: any) {
   }
 
   return newIdentity;
+}
+
+export function updateIdentity(id: string, data: any) {
+  const index = identityStore.findIndex(i => i.id === id);
+  if (index !== -1) {
+    identityStore[index] = { ...identityStore[index], ...data };
+    return identityStore[index];
+  }
+  return null;
+}
+
+export function deleteIdentity(id: string) {
+  const index = identityStore.findIndex(i => i.id === id);
+  if (index !== -1) {
+    identityStore.splice(index, 1);
+    return true;
+  }
+  return false;
 }
 
 export function getActivities(identityId: string) {
@@ -1905,4 +1924,119 @@ export function addTicketComment(ticketId: string, authorId: string, content: st
   return { comment: newComment };
 }
 
+export function getDebates() {
+  return debateStore;
+}
+
+export function getDebateById(id: string) {
+  return debateStore.find(d => d.id === id);
+}
+
+export function createDebate(data: { knowledge_a_id: string; knowledge_b_id: string; context_json: DebateContext }) {
+  const newDebate: Debate = {
+    id: `debate_${Date.now()}`,
+    knowledge_a_id: data.knowledge_a_id,
+    knowledge_b_id: data.knowledge_b_id,
+    context_json: data.context_json,
+    comparison_json: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+  debateStore.push(newDebate);
+  
+  const koA = getKnowledgeById(data.knowledge_a_id);
+  if (koA) {
+    if (!koA.comparisons) koA.comparisons = [];
+    if (!koA.comparisons.includes(newDebate.id)) koA.comparisons.push(newDebate.id);
+  }
+  const koB = getKnowledgeById(data.knowledge_b_id);
+  if (koB) {
+    if (!koB.comparisons) koB.comparisons = [];
+    if (!koB.comparisons.includes(newDebate.id)) koB.comparisons.push(newDebate.id);
+  }
+
+  const historyEventA: KnowledgeHistoryEvent = {
+    id: `hist_${Date.now()}_A`,
+    knowledgeId: data.knowledge_a_id,
+    version: koA ? koA.version : '1.0.0',
+    eventType: 'DEBATE_CREATED',
+    timestamp: new Date().toISOString(),
+    authorId: 'system',
+    authorName: 'Debate Engine',
+    identityType: 'System' as any,
+    changes: `Created debate comparison against ${data.knowledge_b_id}`
+  };
+  knowledgeHistoryStore.unshift(historyEventA);
+
+  const historyEventB: KnowledgeHistoryEvent = {
+    id: `hist_${Date.now()}_B`,
+    knowledgeId: data.knowledge_b_id,
+    version: koB ? koB.version : '1.0.0',
+    eventType: 'DEBATE_CREATED',
+    timestamp: new Date().toISOString(),
+    authorId: 'system',
+    authorName: 'Debate Engine',
+    identityType: 'System' as any,
+    changes: `Created debate comparison against ${data.knowledge_a_id}`
+  };
+  knowledgeHistoryStore.unshift(historyEventB);
+
+  return newDebate;
+}
+
+export function computeDebateScore(debateId: string, result: DebateResult, summary: { overall_summary: string; recommendation: string }) {
+  const debate = debateStore.find(d => d.id === debateId);
+  if (debate) {
+    debate.comparison_json = result;
+    debate.summary_json = summary;
+    debate.updated_at = new Date().toISOString();
+    
+    const koA = getKnowledgeById(debate.knowledge_a_id);
+    const koB = getKnowledgeById(debate.knowledge_b_id);
+    
+    let aWins = 0;
+    let bWins = 0;
+    Object.values(result).forEach((dim: any) => {
+       if (dim.scoreA > dim.scoreB) aWins++;
+       else if (dim.scoreB > dim.scoreA) bWins++;
+    });
+
+    if (koA && aWins > bWins) {
+       koA.trustScore.score = Math.min(100, koA.trustScore.score + 2);
+    } else if (koA && bWins > aWins) {
+       koA.trustScore.score = Math.max(0, koA.trustScore.score - 2);
+    }
+    
+    if (koB && bWins > aWins) {
+       koB.trustScore.score = Math.min(100, koB.trustScore.score + 2);
+    } else if (koB && aWins > bWins) {
+       koB.trustScore.score = Math.max(0, koB.trustScore.score - 2);
+    }
+
+    knowledgeHistoryStore.unshift({
+        id: `hist_${Date.now()}_C`,
+        knowledgeId: debate.knowledge_a_id,
+        version: koA ? koA.version : '1.0.0',
+        eventType: 'DEBATE_RESULT_COMPUTED',
+        timestamp: new Date().toISOString(),
+        authorId: 'system',
+        authorName: 'Debate Engine',
+        identityType: 'System' as any,
+        changes: `Debate result computed.`
+    });
+    knowledgeHistoryStore.unshift({
+        id: `hist_${Date.now()}_D`,
+        knowledgeId: debate.knowledge_b_id,
+        version: koB ? koB.version : '1.0.0',
+        eventType: 'DEBATE_RESULT_COMPUTED',
+        timestamp: new Date().toISOString(),
+        authorId: 'system',
+        authorName: 'Debate Engine',
+        identityType: 'System' as any,
+        changes: `Debate result computed.`
+    });
+    return debate;
+  }
+  return null;
+}
 

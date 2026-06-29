@@ -102,9 +102,12 @@ export interface TrustScoreDetails {
   overall: number;
 }
 
+export type KnowledgeType = 'CODE' | 'CONFIG' | 'DISCOURSE';
+
 export interface KnowledgeObject {
   id: string;
   title: string;
+  knowledgeType?: KnowledgeType;
   
   // AI Native Structure
   problem: string;
@@ -133,6 +136,7 @@ export interface KnowledgeObject {
   tags: string[];
   entities: string[];
   categories: string[];
+  comparisons?: string[];
   
   consumptionMetrics: {
     humanReads: number;
@@ -307,5 +311,37 @@ export interface TrendingGuide {
   tags: string[];
 }
 
+export interface DebateContext {
+  use_case: string;
+  environment: string;
+  constraints: string[];
+}
 
+export interface DebateDimensionScore {
+  scoreA: number;
+  scoreB: number;
+  evidenceLinks: string[];
+  reasoning: string;
+  sandboxMetrics?: any;
+}
 
+export interface DebateResult {
+  performance: DebateDimensionScore;
+  reliability: DebateDimensionScore;
+  usability: DebateDimensionScore;
+  ecosystem: DebateDimensionScore;
+  cost_efficiency: DebateDimensionScore;
+  popularity: DebateDimensionScore;
+  industry_fit: DebateDimensionScore;
+}
+
+export interface Debate {
+  id: string;
+  knowledge_a_id: string;
+  knowledge_b_id: string;
+  context_json: DebateContext;
+  comparison_json: DebateResult | null;
+  summary_json?: { overall_summary: string; recommendation: string };
+  created_at: string;
+  updated_at: string;
+}

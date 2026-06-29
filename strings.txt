@@ -1,0 +1,42 @@
+•
+→
+${sandboxCode.includes("console.log") ? "" : ""}
+${sandboxCode.replace(/
+ 36 Supporting
+ 6 Opposing
+85%
+Based on 42 network participants
+body{font-family:sans-serif;padding:20px;margin:0;color:#333}
+Check constraints against known vulnerabilities.
+Cross-check architecture diagrams
+Debate
+Ensure the diagram matches the proposed setup steps.
+/g, "&gt;")}
+ID: {debateId}
+Key Arguments
+{ko.advantages}
+{ko.alternatives}
+{ko.conclusion}
+{ko.context}
+{ko.disadvantages}
+{ko.evidence}
+{ko.requirements}
+{ko.result}
+{ko.solution}
+{ko.warning}
+No active debates
+Node.js 22 (LTS)
+No output generated yet.
+Note:
+Python 3.12
+React 19 + TypeScript
+Review configuration mapping
+Sandbox execution required to view display.
+Simulated Preview
+Strong Agreement
+The code from the knowledge object has been executed successfully.
+This knowledge object hasn't been compared to others yet.
+Validate security rules
+Verify that all variables defined map to the correct environments.
+{v.type}
+Why trust this?

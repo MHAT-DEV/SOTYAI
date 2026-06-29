@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Identity } from '../types';
+import { Identity, KnowledgeType } from '../types';
 import { 
   Info, 
   AlertTriangle, 
@@ -15,7 +15,10 @@ import {
   Sparkles, 
   Layers, 
   ArrowRight,
-  HelpCircle
+  HelpCircle,
+  Code2,
+  Settings2,
+  MessageSquare
 } from 'lucide-react';
 
 interface CreateKnowledgeProps {
@@ -33,6 +36,7 @@ export default function CreateKnowledge({ identity }: CreateKnowledgeProps) {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [knowledgeType, setKnowledgeType] = useState<KnowledgeType>('CODE');
   const [entryMode, setEntryMode] = useState<'manual' | 'import'>('manual');
   
   // Form State
@@ -62,6 +66,7 @@ export default function CreateKnowledge({ identity }: CreateKnowledgeProps) {
     
     const newKnowledge = {
       ...formData,
+      knowledgeType,
       tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
       authorId: identity?.id || 'anonymous',
       references: [] // Simplified for MVP
@@ -251,13 +256,69 @@ export default function CreateKnowledge({ identity }: CreateKnowledgeProps) {
           </div>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex border-b border-slate-200 p-2 bg-slate-50/50 gap-2">
+        {/* Step 1: Select Knowledge Type */}
+        <div className="p-6 border-b border-slate-200">
+          <h2 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">1</span>
+            เลือกประเภทความรู้ (Knowledge Type)
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              onClick={() => setKnowledgeType('CODE')}
+              className={`p-4 text-left rounded-xl border-2 transition-all cursor-pointer ${
+                knowledgeType === 'CODE' 
+                  ? 'border-blue-500 bg-blue-50/50' 
+                  : 'border-slate-200 hover:border-slate-300'
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${knowledgeType === 'CODE' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'}`}>
+                <Code2 className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-slate-900 mb-1">Code / Executable</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">มีโค้ด สามารถรันได้ รองรับ Sandbox และ Verification Mode</p>
+            </button>
+            <button
+              onClick={() => setKnowledgeType('CONFIG')}
+              className={`p-4 text-left rounded-xl border-2 transition-all cursor-pointer ${
+                knowledgeType === 'CONFIG' 
+                  ? 'border-amber-500 bg-amber-50/50' 
+                  : 'border-slate-200 hover:border-slate-300'
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${knowledgeType === 'CONFIG' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-600'}`}>
+                <Settings2 className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-slate-900 mb-1">System / Config</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">การตั้งค่า, สถาปัตยกรรม (ไม่มี Sandbox)</p>
+            </button>
+            <button
+              onClick={() => setKnowledgeType('DISCOURSE')}
+              className={`p-4 text-left rounded-xl border-2 transition-all cursor-pointer ${
+                knowledgeType === 'DISCOURSE' 
+                  ? 'border-purple-500 bg-purple-50/50' 
+                  : 'border-slate-200 hover:border-slate-300'
+              }`}
+            >
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${knowledgeType === 'DISCOURSE' ? 'bg-purple-100 text-purple-600' : 'bg-slate-100 text-slate-600'}`}>
+                <MessageSquare className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-slate-900 mb-1">Discussion / Theory</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">แนวคิด, ถกเถียง, อ้างอิง (เน้น Citation System)</p>
+            </button>
+          </div>
+        </div>
+
+        {/* Tab Switcher (Step 2) */}
+        <div className="flex border-b border-slate-200 p-2 bg-slate-50/50 gap-2 items-center px-6">
+          <div className="flex items-center gap-2 mr-4 text-sm font-bold text-slate-900">
+            <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs">2</span>
+            รูปแบบการนำเข้า:
+          </div>
           <button
             onClick={() => setEntryMode('manual')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
               entryMode === 'manual'
-                ? 'bg-white text-blue-600 border border-slate-200 shadow-xs'
+                ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
                 : 'text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -268,7 +329,7 @@ export default function CreateKnowledge({ identity }: CreateKnowledgeProps) {
             onClick={() => setEntryMode('import')}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
               entryMode === 'import'
-                ? 'bg-white text-blue-600 border border-slate-200 shadow-xs'
+                ? 'bg-white text-slate-900 border border-slate-200 shadow-xs'
                 : 'text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -578,7 +639,9 @@ export default function CreateKnowledge({ identity }: CreateKnowledgeProps) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-slate-900 mb-1">ปัญหาความต้องการ (Problem)</label>
+                <label className="block text-sm font-bold text-slate-900 mb-1">
+                  {knowledgeType === 'DISCOURSE' ? 'ประเด็นที่โต้แย้ง (Claim)' : knowledgeType === 'CONFIG' ? 'บริบทระบบ (System Context)' : 'ปัญหาความต้องการ (Problem)'}
+                </label>
                 <p className="text-xs text-slate-500 mb-2">อะไรคือปัญหาความขัดข้องหลัก?</p>
                 <textarea 
                   required
@@ -591,7 +654,9 @@ export default function CreateKnowledge({ identity }: CreateKnowledgeProps) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-900 mb-1">บริบทความเชื่อมโยง (Context)</label>
+                <label className="block text-sm font-bold text-slate-900 mb-1">
+                  {knowledgeType === 'DISCOURSE' ? 'ข้อมูลสนับสนุนเบื้องต้น (Context)' : 'บริบทความเชื่อมโยง (Context)'}
+                </label>
                 <p className="text-xs text-slate-500 mb-2">บริบท สภาพแวดล้อม หรือข้อจำกัดที่เกี่ยวข้อง</p>
                 <textarea 
                   required
@@ -606,8 +671,12 @@ export default function CreateKnowledge({ identity }: CreateKnowledgeProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-1">วิธีการแก้ไขปัญหา (Solution)</label>
-              <p className="text-xs text-slate-500 mb-2">วิธีการเขียนโปรแกรมแก้ไข (รองรับคำสั่งรูปแบบมาร์กดาวน์)</p>
+              <label className="block text-sm font-bold text-slate-900 mb-1">
+                {knowledgeType === 'DISCOURSE' ? 'ข้อโต้แย้งหลัก (Main Argument)' : knowledgeType === 'CONFIG' ? 'ขั้นตอนการติดตั้ง (Setup Steps)' : 'วิธีการแก้ไขปัญหา (Solution)'}
+              </label>
+              <p className="text-xs text-slate-500 mb-2">
+                {knowledgeType === 'CODE' ? 'วิธีการเขียนโปรแกรมแก้ไข (รองรับคำสั่งรูปแบบมาร์กดาวน์)' : 'อธิบายรายละเอียดของเนื้อหา...'}
+              </p>
               <textarea 
                 required
                 name="solution"
@@ -620,7 +689,9 @@ export default function CreateKnowledge({ identity }: CreateKnowledgeProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-900 mb-1">หลักฐานอ้างอิงความน่าเชื่อถือ (Evidence)</label>
+              <label className="block text-sm font-bold text-slate-900 mb-1">
+                {knowledgeType === 'DISCOURSE' ? 'หลักฐานสนับสนุน (Evidence)' : knowledgeType === 'CONFIG' ? 'หมายเหตุ (Notes)' : 'หลักฐานอ้างอิงความน่าเชื่อถือ (Evidence)'}
+              </label>
               <p className="text-xs text-slate-500 mb-2">ระบุหลักการพิสูจน์ความเสถียร ผลการทดลองเพื่อส่งคะแนนประมวลผล</p>
               <textarea 
                 required

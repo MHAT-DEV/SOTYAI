@@ -42,6 +42,11 @@ export default function DeveloperPortal() {
   // Analytics Stats State
   const [analytics, setAnalytics] = useState<any>(null);
 
+  // Agent Form State
+  const [showAgentModal, setShowAgentModal] = useState(false);
+  const [editingAgent, setEditingAgent] = useState<Identity | null>(null);
+  const [agentForm, setAgentForm] = useState({ name: '', handle: '', visibility: 'Public', role: 'Contributor' });
+
   const fetchData = () => {
     Promise.all([
       fetch('/api/identities/id_human_1').then(r => r.ok ? r.json() : null),
@@ -132,23 +137,59 @@ export default function DeveloperPortal() {
     fetchData();
   };
 
-  const handleRegisterAgent = async () => {
-    await fetch('/api/identities', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        type: 'AI Agent', 
-        name: 'Auto-Verification Agent', 
-        handle: `@verifier_agent_${Math.floor(Math.random() * 900) + 100}`,
-        ownerId: 'id_human_1',
-        visibility: 'Public',
-        roles: ['Contributor', 'Reviewer'],
-        trustProfile: { identity: 85, knowledge: 80, verification: 90, accuracy: 88, community: 75, collaboration: 80, freshness: 95, historical: 80 },
-        reputation: { knowledge: 200, contribution: 300, verification: 450, citation: 20, review: 180, expertise: 150, community: 100, transparency: 100 },
-        expertise: [{ topic: 'Software Verification', level: 'Expert' }],
-        badges: ['Agent Verified']
-      })
+  const handleRegisterAgent = () => {
+    setEditingAgent(null);
+    setAgentForm({ name: 'New AI Agent', handle: `@agent_${Math.floor(Math.random() * 9000) + 1000}`, visibility: 'Public', role: 'Contributor' });
+    setShowAgentModal(true);
+  };
+
+  const handleEditAgent = (agent: Identity) => {
+    setEditingAgent(agent);
+    setAgentForm({ 
+      name: agent.name, 
+      handle: agent.handle, 
+      visibility: agent.visibility || 'Public',
+      role: agent.roles?.[0] || 'Contributor'
     });
+    setShowAgentModal(true);
+  };
+
+  const handleDeleteAgent = async (agentId: string) => {
+    if (!confirm('Are you sure you want to delete this AI Agent?')) return;
+    await fetch(`/api/identities/${agentId}`, { method: 'DELETE' });
+    fetchData();
+  };
+
+  const handleSaveAgent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = {
+      type: 'AI Agent', 
+      name: agentForm.name, 
+      handle: agentForm.handle,
+      ownerId: 'id_human_1',
+      visibility: agentForm.visibility,
+      roles: [agentForm.role],
+      trustProfile: editingAgent?.trustProfile || { identity: 85, knowledge: 80, verification: 90, accuracy: 88, community: 75, collaboration: 80, freshness: 95, historical: 80 },
+      reputation: editingAgent?.reputation || { knowledge: 200, contribution: 300, verification: 450, citation: 20, review: 180, expertise: 150, community: 100, transparency: 100 },
+      expertise: editingAgent?.expertise || [{ topic: 'General Assistant', level: 'Intermediate' }],
+      badges: editingAgent?.badges || ['Agent Verified']
+    };
+
+    if (editingAgent) {
+      await fetch(`/api/identities/${editingAgent.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } else {
+      await fetch('/api/identities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+    
+    setShowAgentModal(false);
     fetchData();
   };
 
@@ -796,12 +837,75 @@ func main() {
                     </div>
                     
                     <div className="pt-4 border-t border-slate-200 flex gap-2">
-                      <button className="flex-1 py-1.5 text-xs font-semibold bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm">Configure Parameters</button>
-                      <button onClick={() => { setActiveTab('webhooks') }} className="flex-1 py-1.5 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-sm">View SSE Logs</button>
+                      <button onClick={() => handleEditAgent(agent)} className="flex-1 py-1.5 text-xs font-semibold bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm">Edit</button>
+                      <button onClick={() => { setActiveTab('webhooks') }} className="flex-1 py-1.5 text-xs font-semibold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-sm">Logs</button>
+                      <button onClick={() => handleDeleteAgent(agent.id)} className="flex-1 py-1.5 text-xs font-semibold bg-red-50 text-red-700 border border-red-100 rounded-lg hover:bg-red-100 transition-colors shadow-sm">Delete</button>
                     </div>
                   </div>
                 ))}
               </div>
+
+              {showAgentModal && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+                  <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+                    <h3 className="text-xl font-bold text-slate-900 mb-4">{editingAgent ? 'Edit Agent Configuration' : 'Register New Agent'}</h3>
+                    <form onSubmit={handleSaveAgent} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-1">Agent Name</label>
+                        <input
+                          type="text"
+                          required
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          value={agentForm.name}
+                          onChange={e => setAgentForm({ ...agentForm, name: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-1">Handle</label>
+                        <input
+                          type="text"
+                          required
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          value={agentForm.handle}
+                          onChange={e => setAgentForm({ ...agentForm, handle: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-1">Role / Permissions</label>
+                        <select
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          value={agentForm.role}
+                          onChange={e => setAgentForm({ ...agentForm, role: e.target.value })}
+                        >
+                          <option value="Contributor">Contributor (Read/Write)</option>
+                          <option value="Reviewer">Reviewer (Audit/Verify)</option>
+                          <option value="Observer">Observer (Read Only)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-slate-700 mb-1">Visibility</label>
+                        <select
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          value={agentForm.visibility}
+                          onChange={e => setAgentForm({ ...agentForm, visibility: e.target.value })}
+                        >
+                          <option value="Public">Public (Visible to everyone)</option>
+                          <option value="Organization Only">Organization Only</option>
+                          <option value="Private">Private (Owner only)</option>
+                        </select>
+                      </div>
+                      <div className="flex gap-2 pt-4">
+                        <button type="button" onClick={() => setShowAgentModal(false)} className="flex-1 py-2 text-sm font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
+                          Cancel
+                        </button>
+                        <button type="submit" className="flex-1 py-2 text-sm font-bold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors">
+                          {editingAgent ? 'Save Changes' : 'Register Agent'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

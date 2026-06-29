@@ -23,7 +23,7 @@ import TrendingArena from './components/TrendingArena';
 import ChallengesArena from './components/ChallengesArena';
 import TechDomains from './components/TechDomains';
 import AboutNetwork from './components/AboutNetwork';
-
+import { DebateDetail } from './components/DebateDetail';
 
 export default function App() {
   const navigate = useNavigate();
@@ -108,7 +108,9 @@ export default function App() {
             setUnreadCount(data.unreadCount);
           }
         })
-        .catch(err => console.error('Error fetching unread count:', err));
+        .catch(() => {
+          // Silently ignore fetch errors (e.g. during dev server restarts)
+        });
     };
 
     fetchUnreadCount();
@@ -627,6 +629,7 @@ export default function App() {
             <Route path="/trending" element={<TrendingArena identity={currentIdentity} />} />
             <Route path="/challenges" element={<ChallengesArena identity={currentIdentity} />} />
             <Route path="/knowledge/:id" element={<KnowledgeDetail identity={currentIdentity} />} />
+            <Route path="/debate/:id" element={<DebateDetail />} />
             <Route path="/create" element={<CreateKnowledge identity={currentIdentity} />} />
             <Route path="/identity/:id" element={<IdentityProfile identity={currentIdentity} />} />
             <Route path="/settings" element={<AccountSettings />} />

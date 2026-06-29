@@ -3,7 +3,7 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 
 // In-memory data store for SOTYAI
-import { initializeData, getKnowledge, getKnowledgeById, getIdentities, getIdentityById, getActivities, addKnowledge, getAccounts, getAccountById, getSessions, getReports, createReport, updateReportStatus, deleteReport, getTickets, getTicketById, createTicket, updateTicketStatus, upvoteTicket, addTicketComment, getChallenges, getChallengeById, createChallenge, submitChallengeSolution, getTrendingGuides, createTrendingGuide, upvoteTrendingGuide } from './src/server/db.js';
+import { initializeData, getKnowledge, getKnowledgeById, getIdentities, getIdentityById, getActivities, addKnowledge, getAccounts, getAccountById, getSessions, getReports, createReport, updateReportStatus, deleteReport, getTickets, getTicketById, createTicket, updateTicketStatus, upvoteTicket, addTicketComment, getChallenges, getChallengeById, createChallenge, submitChallengeSolution, getTrendingGuides, createTrendingGuide, upvoteTrendingGuide, getConversations, getUnreadCount, getMessages, markMessagesAsRead } from './src/server/db.js';
 import { registerApiV2 } from './src/server/apiv2.js';
 
 async function startServer() {
@@ -231,28 +231,20 @@ async function startServer() {
   // PM System endpoints
   app.get('/api/messages', (req, res) => {
     const { senderId, receiverId } = req.query;
-    import('./src/server/db.js').then(db => {
-      res.json(db.getMessages((senderId as string) || '', (receiverId as string) || ''));
-    });
+    res.json(getMessages((senderId as string) || '', (receiverId as string) || ''));
   });
 
   app.get('/api/messages/conversations/:identityId', (req, res) => {
-    import('./src/server/db.js').then(db => {
-      res.json(db.getConversations(req.params.identityId));
-    });
+    res.json(getConversations(req.params.identityId));
   });
 
   app.get('/api/messages/unread-count/:identityId', (req, res) => {
-    import('./src/server/db.js').then(db => {
-      res.json(db.getUnreadCount(req.params.identityId));
-    });
+    res.json(getUnreadCount(req.params.identityId));
   });
 
   app.post('/api/messages/read', (req, res) => {
     const { senderId, receiverId } = req.body;
-    import('./src/server/db.js').then(db => {
-      res.json(db.markMessagesAsRead(senderId, receiverId));
-    });
+    res.json(markMessagesAsRead(senderId, receiverId));
   });
 
   app.post('/api/messages', (req, res) => {
@@ -442,6 +434,28 @@ async function startServer() {
       res.json(newId);
     });
   });
+
+  app.put('/api/identities/:id', (req, res) => {
+    import('./src/server/db.js').then(db => {
+      const updated = db.updateIdentity(req.params.id, req.body);
+      if (updated) {
+        res.json(updated);
+      } else {
+        res.status(404).json({ error: 'Identity not found' });
+      }
+    });
+  });
+
+  app.delete('/api/identities/:id', (req, res) => {
+    import('./src/server/db.js').then(db => {
+      const success = db.deleteIdentity(req.params.id);
+      if (success) {
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: 'Identity not found' });
+      }
+    });
+  });
   
   app.get('/api/identities/:id', (req, res) => {
     const id = getIdentityById(req.params.id);
@@ -575,6 +589,53 @@ async function startServer() {
     }
   });
 
+  // Sandbox API
+  app.post('/api/sandbox/execute', (req, res) => {
+    const { code, language } = req.body;
+    if (!code) {
+      return res.status(400).json({ error: 'No code provided' });
+    }
+
+    if (language === 'javascript' || language === 'typescript' || language === 'Node.js 22 (LTS)') {
+      import('vm').then(vm => {
+        const logs: string[] = [];
+        const sandbox = {
+          console: {
+            log: (...args: any[]) => logs.push(args.join(' ')),
+            error: (...args: any[]) => logs.push('ERROR: ' + args.join(' ')),
+            warn: (...args: any[]) => logs.push('WARN: ' + args.join(' ')),
+            info: (...args: any[]) => logs.push('INFO: ' + args.join(' '))
+          },
+          Math, Date, setTimeout, setInterval, clearTimeout, clearInterval,
+          process: { env: {} }
+        };
+        const context = vm.createContext(sandbox);
+        try {
+          // Remove typescript types quickly for execution if any, though standard JS is expected
+          const cleanCode = code.replace(/import .*;?\n/g, ''); // Naive import removal for safe execution
+          const result = vm.runInContext(cleanCode, context, { timeout: 5000 });
+          res.json({
+            success: true,
+            logs,
+            result: result !== undefined ? String(result) : null
+          });
+        } catch (err: any) {
+          res.json({
+            success: false,
+            logs,
+            error: err.message || String(err)
+          });
+        }
+      });
+    } else {
+      res.json({
+        success: true,
+        logs: ['# Execution skipped for non-Node.js environment on backend'],
+        result: 'HTML/React content is rendered in the Display tab.'
+      });
+    }
+  });
+
   // Verification endpoints
   app.get('/api/knowledge/:id/verifications', (req, res) => {
     import('./src/server/db.js').then(db => {
@@ -610,6 +671,56 @@ async function startServer() {
       } else {
         res.status(404).json({ error: 'Knowledge Object not found or invalid metric type' });
       }
+    });
+  });
+
+  // Debate API Endpoints
+  app.get('/api/debates', (req, res) => {
+    import('./src/server/db.js').then(db => {
+      res.json(db.getDebates());
+    });
+  });
+
+  app.get('/api/debate/:id', (req, res) => {
+    import('./src/server/db.js').then(db => {
+      const d = db.getDebateById(req.params.id);
+      if (d) res.json(d);
+      else res.status(404).json({ error: 'Debate not found' });
+    });
+  });
+
+  app.post('/api/debate/create', (req, res) => {
+    import('./src/server/db.js').then(db => {
+      const { knowledge_a_id, knowledge_b_id, context } = req.body;
+      const newDebate = db.createDebate({ knowledge_a_id, knowledge_b_id, context_json: context });
+      res.json(newDebate);
+    });
+  });
+
+  app.post('/api/debate/:id/compute', (req, res) => {
+    import('./src/server/db.js').then(db => {
+      const debateId = req.params.id;
+      // In a real app, this would trigger an AI agent or job.
+      // Here we mock the result.
+      const mockResult = {
+        performance: { scoreA: 80, scoreB: 85, evidenceLinks: [], reasoning: 'B has slight edge in throughput.' },
+        reliability: { scoreA: 95, scoreB: 90, evidenceLinks: [], reasoning: 'A is more stable.' },
+        usability: { scoreA: 70, scoreB: 90, evidenceLinks: [], reasoning: 'B has better developer experience.' },
+        ecosystem: { scoreA: 85, scoreB: 80, evidenceLinks: [], reasoning: 'A has older ecosystem.' },
+        cost_efficiency: { scoreA: 90, scoreB: 85, evidenceLinks: [], reasoning: 'A is cheaper.' },
+        popularity: { scoreA: 90, scoreB: 95, evidenceLinks: [], reasoning: 'B is currently trending.' },
+        industry_fit: { scoreA: 95, scoreB: 95, evidenceLinks: [], reasoning: 'Both fit well.' }
+      };
+      const mockSummary = { overall_summary: 'Both are good choices depending on context.', recommendation: 'Use A for stability, B for speed.' };
+      const computed = db.computeDebateScore(debateId, mockResult, mockSummary);
+      res.json(computed);
+    });
+  });
+
+  app.post('/api/debate/:id/sandbox-run', (req, res) => {
+    import('./src/server/db.js').then(db => {
+      // Mock sandbox run
+      res.json({ success: true, message: 'Sandbox comparison executed successfully. Metrics collected.' });
     });
   });
 

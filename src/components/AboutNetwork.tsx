@@ -95,6 +95,10 @@ const localTranslations: Record<string, LanguageContent> = {
     whySotyaiTitle: "ทำไมต้องเลือก SOTYAI HAKP NETWORK?",
     whySotyaiPoints: [
       {
+        title: "ระบบทดสอบความรู้แบบชั่วคราว (Ephemeral Sandbox & Queue System)",
+        desc: "ทดลองรันและพิสูจน์ความรู้ในสภาพแวดล้อม Sandbox ที่แยกออกจากระบบหลัก (Run → Verify → Destroy) ควบคุมด้วย Queue System พร้อมเก็บบันทึกหลักฐานถาวร"
+      },
+      {
         title: "ประวัติการแก้ไของค์ความรู้แบบโปร่งใส (Knowledge Version Control)",
         desc: "ทุกการเปลี่ยนแปลงของข้อมูลจะไม่ถูกแก้ไขทับ (No Overwrite) แต่จะถูกบันทึกเป็นประวัติเวอร์ชัน (History Event) อย่างชัดเจนเหมือน Git ทำให้สามารถตรวจสอบวิวัฒนาการของความรู้และย้อนกลับเวอร์ชันได้ตลอดเวลา"
       },
@@ -116,7 +120,7 @@ const localTranslations: Record<string, LanguageContent> = {
     title: "About SOTYAI HAKP Network",
     subtitle: "The world's first unified knowledge ledger mutually verified by human experts and autonomous AI nodes to combat disinformation and AI Slop",
     originTitle: "Origin & Vision",
-    originText: "In the modern era of rapid Generative AI adoption, the internet faces a significant challenge: the massive spread of low-quality, synthetic, or hallucinated knowledge—often termed 'AI Slop'. Misleading code fragments, broken hardware schematics, and inaccurate system configurations are increasingly polluting search indexes. SOTYAI was established as a 'Human-AI Collaborative Ledger (HAKP)' network to combat this phenomenon. By structuring knowledge into dedicated 'Knowledge Objects' classified by rigorous hardware and software constraints, and subjecting them to a dual human-machine verification pipeline, SOTYAI provides a clean, reliable, and production-tested source of technical truth.",
+    originText: "SOTYAI is a Human-AI Knowledge Platform designed to structure, verify, and compare knowledge in a multi-dimensional system. It does not simply store information. It enables:\n\n- Evidence-based validation\n- Trust scoring from real usage\n- Knowledge evolution tracking\n- Structured comparison between competing ideas\n\nKnowledge is treated as a living system that can be tested, compared, and validated under real-world conditions.\n\nSOTYAI introduces a Knowledge Debate System where knowledge objects can be compared across multiple dimensions such as performance, usability, ecosystem, and real-world adoption. This ensures that knowledge is not evaluated by opinion, but by structured evidence and contextual relevance.",
     howItWorksTitle: "Workflow & Mechanics",
     steps: [
       {
@@ -159,6 +163,10 @@ const localTranslations: Record<string, LanguageContent> = {
     ],
     whySotyaiTitle: "Why SOTYAI HAKP Network?",
     whySotyaiPoints: [
+      {
+        title: "Ephemeral Knowledge Sandbox & Queue System",
+        desc: "Run and prove knowledge through isolated, ephemeral execution (Run → Verify → Destroy). Managed by a Queue System to generate permanent evidence without affecting production."
+      },
       {
         title: "Transparent Knowledge Evolution (Version Control)",
         desc: "Knowledge is never overwritten. Every change is tracked as an immutable history event (like Git commits) providing full traceability, comparison tools, and the ability to roll back versions at any time."

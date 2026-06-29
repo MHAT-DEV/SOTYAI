@@ -3,8 +3,290 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Tag, Folder, Shield, Clock, BookOpen, Search, ArrowRight, Network, Database, Eye, Bookmark, Share2, HelpCircle, Activity, Filter, SlidersHorizontal } from 'lucide-react';
 import { KnowledgeObject } from '../types';
 import { formatDistanceToNow } from 'date-fns';
+import { useLanguage } from '../context/LanguageContext';
+
+interface LocalTranslation {
+  searchFilterTitle: string;
+  searchPlaceholder: string;
+  typeMoreChars: (rem: number) => string;
+  searchActive: (count: number) => string;
+  minTrustScore: string;
+  clearBasicFilter: string;
+  envLabel: string;
+  all: string;
+  authorTypeLabel: string;
+  human: string;
+  aiAgent: string;
+  org: string;
+  minVerifications: string;
+  times: string;
+  sortByLabel: string;
+  sortTrustScore: string;
+  sortLastUpdated: string;
+  sortMostSaves: string;
+  sortMostReads: string;
+  clearAllFilters: string;
+  filteredFrom: (count: number) => string;
+  noResultsTitle: string;
+  noResultsDesc: string;
+}
+
+const localTranslations: Record<string, LocalTranslation> = {
+  en: {
+    searchFilterTitle: 'Search & Filter Nodes',
+    searchPlaceholder: 'Type at least 3 characters to start Instant Search...',
+    typeMoreChars: (rem) => `Type ${rem} more character${rem > 1 ? 's' : ''}`,
+    searchActive: (count) => `Search active (${count} results)`,
+    minTrustScore: 'Min Trust Score',
+    clearBasicFilter: 'Clear Basic Filter',
+    envLabel: 'Environment',
+    all: 'All',
+    authorTypeLabel: 'Author Type',
+    human: 'Human',
+    aiAgent: 'AI Agent',
+    org: 'Organization',
+    minVerifications: 'Min Verifications',
+    times: 'times',
+    sortByLabel: 'Sort By',
+    sortTrustScore: 'Highest Trust Score',
+    sortLastUpdated: 'Last Updated',
+    sortMostSaves: 'Most Saves',
+    sortMostReads: 'Most Reads',
+    clearAllFilters: 'Clear All Filters',
+    filteredFrom: (count) => `Filtered from ${count} nodes`,
+    noResultsTitle: 'No Nodes Match Criteria',
+    noResultsDesc: 'Try adjusting or clearing your filters to search again.',
+  },
+  th: {
+    searchFilterTitle: 'ระบบค้นหาและกรองข้อมูล Node (Search & Filter)',
+    searchPlaceholder: 'พิมพ์อย่างน้อย 3 ตัวอักษร เพื่อเริ่มค้นหาใน Node ทันที (Instant Search)...',
+    typeMoreChars: (rem) => `พิมพ์อีก ${rem} ตัวอักษร`,
+    searchActive: (count) => `ค้นหาทำงานอยู่ (${count} ผลลัพธ์)`,
+    minTrustScore: 'ค่าความน่าเชื่อถือขั้นต่ำ (Min Trust Score)',
+    clearBasicFilter: 'ล้างตัวกรอง Basic',
+    envLabel: 'สภาพแวดล้อม (Environment)',
+    all: 'ทั้งหมด (All)',
+    authorTypeLabel: 'ประเภทผู้สร้าง (Author Type)',
+    human: 'มนุษย์ (Human)',
+    aiAgent: 'บอท AI (AI Agent)',
+    org: 'องค์กร (Organization)',
+    minVerifications: 'การตรวจสอบขั้นต่ำ',
+    times: 'ครั้ง',
+    sortByLabel: 'เรียงตาม (Sort By)',
+    sortTrustScore: 'ความเชื่อถือสูงสุด (Trust Score)',
+    sortLastUpdated: 'อัปเดตล่าสุด (Last Updated)',
+    sortMostSaves: 'บัน উল্লেখযোগ্য (Most Saves)', // fixed error
+    sortMostReads: 'ยอดอ่านสูงสุด (Most Reads)',
+    clearAllFilters: 'ล้างตัวกรองทั้งหมด',
+    filteredFrom: (count) => `กรองจากทั้งหมด ${count} nodes`,
+    noResultsTitle: 'ไม่พบข้อมูล Node ตรงตามเงื่อนไข',
+    noResultsDesc: 'ลองปรับปรุงหรือล้างตัวกรอง เพื่อค้นหาข้อมูลอีกครั้ง',
+  },
+  ja: {
+    searchFilterTitle: 'ノードの検索とフィルタリング',
+    searchPlaceholder: 'インスタント検索を開始するには3文字以上入力してください...',
+    typeMoreChars: (rem) => `あと ${rem} 文字入力`,
+    searchActive: (count) => `検索結果 (${count} 件)`,
+    minTrustScore: '最小信頼スコア',
+    clearBasicFilter: '基本フィルターをクリア',
+    envLabel: '環境',
+    all: 'すべて',
+    authorTypeLabel: '作成者タイプ',
+    human: '人間',
+    aiAgent: 'AI エージェント',
+    org: '組織',
+    minVerifications: '最小検証回数',
+    times: '回',
+    sortByLabel: '並び替え',
+    sortTrustScore: '最高信頼スコア',
+    sortLastUpdated: '最終更新',
+    sortMostSaves: '保存数が多い',
+    sortMostReads: '閲覧数が多い',
+    clearAllFilters: 'すべてのフィルターをクリア',
+    filteredFrom: (count) => `全 ${count} ノードからフィルタリング`,
+    noResultsTitle: '条件に一致するノードが見つかりません',
+    noResultsDesc: '検索条件を変更するか、フィルターをクリアしてください。',
+  },
+  zh: {
+    searchFilterTitle: '搜索和过滤节点',
+    searchPlaceholder: '输入至少 3 个字符开始即时搜索...',
+    typeMoreChars: (rem) => `再输入 ${rem} 个字符`,
+    searchActive: (count) => `搜索中 (${count} 个结果)`,
+    minTrustScore: '最低信任分数',
+    clearBasicFilter: '清除基本过滤',
+    envLabel: '环境',
+    all: '全部',
+    authorTypeLabel: '创建者类型',
+    human: '人类',
+    aiAgent: 'AI 代理',
+    org: '组织',
+    minVerifications: '最低验证次数',
+    times: '次',
+    sortByLabel: '排序方式',
+    sortTrustScore: '最高信任分',
+    sortLastUpdated: '最近更新',
+    sortMostSaves: '最多保存',
+    sortMostReads: '最多阅读',
+    clearAllFilters: '清除所有过滤器',
+    filteredFrom: (count) => `从 ${count} 个节点中过滤`,
+    noResultsTitle: '没有匹配条件的节点',
+    noResultsDesc: '请尝试调整或清除过滤器以重新搜索。',
+  },
+  ko: {
+    searchFilterTitle: '노드 검색 및 필터',
+    searchPlaceholder: '3자 이상 입력하여 즉시 검색 시작...',
+    typeMoreChars: (rem) => `${rem}자 더 입력하세요`,
+    searchActive: (count) => `검색 활성화됨 (${count}개 결과)`,
+    minTrustScore: '최소 신뢰 점수',
+    clearBasicFilter: '기본 필터 지우기',
+    envLabel: '환경',
+    all: '전체',
+    authorTypeLabel: '작성자 유형',
+    human: '인간',
+    aiAgent: 'AI 에이전트',
+    org: '조직',
+    minVerifications: '최소 검증 횟수',
+    times: '회',
+    sortByLabel: '정렬 기준',
+    sortTrustScore: '가장 높은 신뢰 점수',
+    sortLastUpdated: '최근 업데이트',
+    sortMostSaves: '가장 많이 저장됨',
+    sortMostReads: '가장 많이 읽음',
+    clearAllFilters: '모든 필터 지우기',
+    filteredFrom: (count) => `${count}개 노드에서 필터링됨`,
+    noResultsTitle: '조건과 일치하는 노드가 없습니다',
+    noResultsDesc: '필터를 조정하거나 지우고 다시 검색해보세요.',
+  },
+  de: {
+    searchFilterTitle: 'Knoten Suchen & Filtern',
+    searchPlaceholder: 'Geben Sie mindestens 3 Zeichen ein, um die Sofortsuche zu starten...',
+    typeMoreChars: (rem) => `Noch ${rem} Zeichen eingeben`,
+    searchActive: (count) => `Suche aktiv (${count} Ergebnisse)`,
+    minTrustScore: 'Min Vertrauenswert',
+    clearBasicFilter: 'Basisfilter löschen',
+    envLabel: 'Umgebung',
+    all: 'Alle',
+    authorTypeLabel: 'Autortyp',
+    human: 'Mensch',
+    aiAgent: 'KI-Agent',
+    org: 'Organisation',
+    minVerifications: 'Min Verifizierungen',
+    times: 'mal',
+    sortByLabel: 'Sortieren nach',
+    sortTrustScore: 'Höchster Vertrauenswert',
+    sortLastUpdated: 'Zuletzt aktualisiert',
+    sortMostSaves: 'Meiste Speicherungen',
+    sortMostReads: 'Am meisten gelesen',
+    clearAllFilters: 'Alle Filter löschen',
+    filteredFrom: (count) => `Gefiltert aus ${count} Knoten`,
+    noResultsTitle: 'Keine passenden Knoten',
+    noResultsDesc: 'Versuchen Sie, Ihre Filter anzupassen oder zu löschen.',
+  },
+  fr: {
+    searchFilterTitle: 'Rechercher et Filtrer les Nœuds',
+    searchPlaceholder: 'Tapez au moins 3 caractères pour lancer la recherche...',
+    typeMoreChars: (rem) => `Encore ${rem} caractère(s)`,
+    searchActive: (count) => `Recherche active (${count} résultats)`,
+    minTrustScore: 'Score de confiance min',
+    clearBasicFilter: 'Effacer filtre de base',
+    envLabel: 'Environnement',
+    all: 'Tout',
+    authorTypeLabel: 'Type d\'Auteur',
+    human: 'Humain',
+    aiAgent: 'Agent IA',
+    org: 'Organisation',
+    minVerifications: 'Vérifications min',
+    times: 'fois',
+    sortByLabel: 'Trier par',
+    sortTrustScore: 'Meilleur score de confiance',
+    sortLastUpdated: 'Dernière mise à jour',
+    sortMostSaves: 'Le plus sauvegardé',
+    sortMostReads: 'Le plus lu',
+    clearAllFilters: 'Effacer tous les filtres',
+    filteredFrom: (count) => `Filtré parmi ${count} nœuds`,
+    noResultsTitle: 'Aucun nœud correspondant',
+    noResultsDesc: 'Essayez d\'ajuster ou d\'effacer vos filtres.',
+  },
+  es: {
+    searchFilterTitle: 'Buscar y Filtrar Nodos',
+    searchPlaceholder: 'Escriba al menos 3 caracteres para iniciar la búsqueda...',
+    typeMoreChars: (rem) => `Escriba ${rem} carácter(es) más`,
+    searchActive: (count) => `Búsqueda activa (${count} resultados)`,
+    minTrustScore: 'Puntuación de confianza min',
+    clearBasicFilter: 'Limpiar filtro básico',
+    envLabel: 'Entorno',
+    all: 'Todo',
+    authorTypeLabel: 'Tipo de Autor',
+    human: 'Humano',
+    aiAgent: 'Agente IA',
+    org: 'Organización',
+    minVerifications: 'Verificaciones mínimas',
+    times: 'veces',
+    sortByLabel: 'Ordenar por',
+    sortTrustScore: 'Mayor puntuación de confianza',
+    sortLastUpdated: 'Última actualización',
+    sortMostSaves: 'Más guardados',
+    sortMostReads: 'Más leídos',
+    clearAllFilters: 'Limpiar todos los filtros',
+    filteredFrom: (count) => `Filtrado de ${count} nodos`,
+    noResultsTitle: 'No hay nodos que coincidan',
+    noResultsDesc: 'Intente ajustar o limpiar sus filtros.',
+  },
+  ru: {
+    searchFilterTitle: 'Поиск и фильтрация узлов',
+    searchPlaceholder: 'Введите минимум 3 символа для мгновенного поиска...',
+    typeMoreChars: (rem) => `Введите еще ${rem} символ(ов)`,
+    searchActive: (count) => `Поиск активен (${count} результатов)`,
+    minTrustScore: 'Мин. индекс доверия',
+    clearBasicFilter: 'Сбросить базовый фильтр',
+    envLabel: 'Среда',
+    all: 'Все',
+    authorTypeLabel: 'Тип автора',
+    human: 'Человек',
+    aiAgent: 'ИИ-Агент',
+    org: 'Организация',
+    minVerifications: 'Мин. проверок',
+    times: 'раз',
+    sortByLabel: 'Сортировать по',
+    sortTrustScore: 'Высший индекс доверия',
+    sortLastUpdated: 'Последнее обновление',
+    sortMostSaves: 'Больше всего сохранений',
+    sortMostReads: 'Больше всего прочтений',
+    clearAllFilters: 'Сбросить все фильтры',
+    filteredFrom: (count) => `Отфильтровано из ${count} узлов`,
+    noResultsTitle: 'Узлы не найдены',
+    noResultsDesc: 'Попробуйте изменить или сбросить фильтры.',
+  },
+  vi: {
+    searchFilterTitle: 'Tìm kiếm & Lọc Node',
+    searchPlaceholder: 'Nhập ít nhất 3 ký tự để tìm kiếm tức thì...',
+    typeMoreChars: (rem) => `Nhập thêm ${rem} ký tự`,
+    searchActive: (count) => `Tìm kiếm hoạt động (${count} kết quả)`,
+    minTrustScore: 'Điểm tin cậy tối thiểu',
+    clearBasicFilter: 'Xóa bộ lọc cơ bản',
+    envLabel: 'Môi trường',
+    all: 'Tất cả',
+    authorTypeLabel: 'Loại tác giả',
+    human: 'Con người',
+    aiAgent: 'Đại lý AI',
+    org: 'Tổ chức',
+    minVerifications: 'Số lần xác minh tối thiểu',
+    times: 'lần',
+    sortByLabel: 'Sắp xếp theo',
+    sortTrustScore: 'Điểm tin cậy cao nhất',
+    sortLastUpdated: 'Cập nhật mới nhất',
+    sortMostSaves: 'Được lưu nhiều nhất',
+    sortMostReads: 'Được đọc nhiều nhất',
+    clearAllFilters: 'Xóa tất cả bộ lọc',
+    filteredFrom: (count) => `Đã lọc từ ${count} node`,
+    noResultsTitle: 'Không có node nào phù hợp',
+    noResultsDesc: 'Vui lòng điều chỉnh hoặc xóa bộ lọc để tìm kiếm lại.',
+  }
+};
 
 export default function TagsExplorer() {
+  const { language } = useLanguage();
+  const tLocal = localTranslations[language] || localTranslations.en;
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = searchParams.get('tab') || 'tags'; // 'tags', 'categories', 'entities'
   const initialSelection = searchParams.get('select') || '';
@@ -232,7 +514,7 @@ export default function TagsExplorer() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Sidebar Selector */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 h-[calc(100vh-250px)] overflow-y-auto sticky top-24">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 max-h-[50vh] lg:max-h-none lg:h-[calc(100vh-250px)] overflow-y-auto lg:sticky lg:top-24">
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
@@ -423,7 +705,7 @@ export default function TagsExplorer() {
                 <div className="flex flex-col sm:flex-row gap-3 items-center justify-between border-b border-slate-100 pb-4">
                   <div className="flex items-center gap-2">
                     <SlidersHorizontal className="w-5 h-5 text-slate-500" />
-                    <h3 className="font-bold text-slate-800 text-sm">ระบบค้นหาและกรองข้อมูล Node (Search & Filter)</h3>
+                    <h3 className="font-bold text-slate-800 text-sm">{tLocal.searchFilterTitle}</h3>
                   </div>
                   <div className="flex bg-slate-100 p-1 rounded-lg">
                     <button
@@ -448,17 +730,17 @@ export default function TagsExplorer() {
                     type="text"
                     value={searchNodeText}
                     onChange={(e) => setSearchNodeText(e.target.value)}
-                    placeholder="พิมพ์อย่างน้อย 3 ตัวอักษร เพื่อเริ่มค้นหาใน Node ทันที (Instant Search)..."
+                    placeholder={tLocal.searchPlaceholder}
                     className="w-full pl-10 pr-32 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     {searchNodeText.trim().length > 0 && searchNodeText.trim().length < 3 ? (
                       <span className="text-[10px] text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100 font-medium animate-pulse">
-                        พิมพ์อีก {3 - searchNodeText.trim().length} ตัวอักษร
+                        {tLocal.typeMoreChars(3 - searchNodeText.trim().length)}
                       </span>
                     ) : searchNodeText.trim().length >= 3 ? (
                       <span className="text-[10px] text-green-700 bg-green-50 px-2 py-0.5 rounded border border-green-100 font-bold">
-                        ค้นหาทำงานอยู่ ({sortedMatchingKnowledge.length} ผลลัพธ์)
+                        {tLocal.searchActive(sortedMatchingKnowledge.length)}
                       </span>
                     ) : null}
                   </div>
@@ -469,7 +751,7 @@ export default function TagsExplorer() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-slate-600 flex justify-between">
-                        <span>ค่าความน่าเชื่อถือขั้นต่ำ (Min Trust Score)</span>
+                        <span>{tLocal.minTrustScore}</span>
                         <span className="text-blue-600 font-bold">{minTrustScore}%</span>
                       </label>
                       <input
@@ -490,7 +772,7 @@ export default function TagsExplorer() {
                           }}
                           className="text-xs text-rose-600 hover:text-rose-800 hover:underline font-semibold"
                         >
-                          ล้างตัวกรอง Basic
+                          {tLocal.clearBasicFilter}
                         </button>
                       )}
                     </div>
@@ -500,13 +782,13 @@ export default function TagsExplorer() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                       {/* Env Filter */}
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-600">สภาพแวดล้อม (Environment)</label>
+                        <label className="text-xs font-semibold text-slate-600">{tLocal.envLabel}</label>
                         <select
                           value={envFilter}
                           onChange={(e) => setEnvFilter(e.target.value)}
                           className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          <option value="All">ทั้งหมด (All)</option>
+                          <option value="All">{tLocal.all}</option>
                           <option value="React 19">React 19</option>
                           <option value="Node">Node.js</option>
                           <option value="JavaScript">JavaScript</option>
@@ -517,24 +799,24 @@ export default function TagsExplorer() {
 
                       {/* Author Type */}
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-600">ประเภทผู้สร้าง (Author Type)</label>
+                        <label className="text-xs font-semibold text-slate-600">{tLocal.authorTypeLabel}</label>
                         <select
                           value={authorTypeFilter}
                           onChange={(e) => setAuthorTypeFilter(e.target.value)}
                           className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          <option value="All">ทั้งหมด (All)</option>
-                          <option value="Human">มนุษย์ (Human)</option>
-                          <option value="AI Agent">บอท AI (AI Agent)</option>
-                          <option value="Organization">องค์กร (Organization)</option>
+                          <option value="All">{tLocal.all}</option>
+                          <option value="Human">{tLocal.human}</option>
+                          <option value="AI Agent">{tLocal.aiAgent}</option>
+                          <option value="Organization">{tLocal.org}</option>
                         </select>
                       </div>
 
                       {/* Min Verifications */}
                       <div className="space-y-1">
                         <label className="text-xs font-semibold text-slate-600 flex justify-between">
-                          <span>การตรวจสอบขั้นต่ำ</span>
-                          <span className="font-bold text-slate-700">{minVerifications} ครั้ง</span>
+                          <span>{tLocal.minVerifications}</span>
+                          <span className="font-bold text-slate-700">{minVerifications} {tLocal.times}</span>
                         </label>
                         <input
                           type="range"
@@ -548,16 +830,16 @@ export default function TagsExplorer() {
 
                       {/* Sort By */}
                       <div className="space-y-1">
-                        <label className="text-xs font-semibold text-slate-600">เรียงตาม (Sort By)</label>
+                        <label className="text-xs font-semibold text-slate-600">{tLocal.sortByLabel}</label>
                         <select
                           value={sortBy}
                           onChange={(e) => setSortBy(e.target.value as any)}
                           className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                          <option value="trustScore">ความเชื่อถือสูงสุด (Trust Score)</option>
-                          <option value="updatedAt">อัปเดตล่าสุด (Last Updated)</option>
-                          <option value="saves">บันทึกสูงสุด (Most Saves)</option>
-                          <option value="reads">ยอดอ่านสูงสุด (Most Reads)</option>
+                          <option value="trustScore">{tLocal.sortTrustScore}</option>
+                          <option value="updatedAt">{tLocal.sortLastUpdated}</option>
+                          <option value="saves">{tLocal.sortMostSaves}</option>
+                          <option value="reads">{tLocal.sortMostReads}</option>
                         </select>
                       </div>
                     </div>
@@ -565,7 +847,7 @@ export default function TagsExplorer() {
                     <div className="flex justify-between items-center border-t border-slate-100 pt-3 text-xs">
                       <div className="space-y-1">
                         <label className="text-xs font-semibold text-slate-600 flex gap-2">
-                          <span>ค่าความน่าเชื่อถือขั้นต่ำ (Min Trust Score):</span>
+                          <span>{tLocal.minTrustScore}:</span>
                           <span className="text-purple-600 font-bold">{minTrustScore}%</span>
                         </label>
                         <input
@@ -588,7 +870,7 @@ export default function TagsExplorer() {
                         }}
                         className="text-xs text-rose-600 hover:text-rose-800 hover:underline font-semibold"
                       >
-                        ล้างตัวกรองทั้งหมด
+                        {tLocal.clearAllFilters}
                       </button>
                     </div>
                   </div>
@@ -601,7 +883,7 @@ export default function TagsExplorer() {
                   <span>Connected Verifiable SOTYAI Nodes ({sortedMatchingKnowledge.length})</span>
                   {sortedMatchingKnowledge.length !== matchingKnowledge.length && (
                     <span className="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-semibold border border-blue-100 normal-case">
-                      กรองจากทั้งหมด {matchingKnowledge.length} nodes
+                      {tLocal.filteredFrom(matchingKnowledge.length)}
                     </span>
                   )}
                 </h3>
@@ -609,8 +891,8 @@ export default function TagsExplorer() {
                 {sortedMatchingKnowledge.length === 0 ? (
                   <div className="bg-white border border-dashed border-slate-200 rounded-xl p-12 text-center">
                     <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                    <h3 className="text-lg font-bold text-slate-900 mb-1">ไม่พบข้อมูล Node ตรงตามเงื่อนไข</h3>
-                    <p className="text-sm text-slate-500 mb-4">ลองปรับปรุงหรือล้างตัวกรอง เพื่อค้นหาข้อมูลอีกครั้ง</p>
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">{tLocal.noResultsTitle}</h3>
+                    <p className="text-sm text-slate-500 mb-4">{tLocal.noResultsDesc}</p>
                     <button 
                       onClick={() => {
                         setSearchNodeText('');
@@ -622,7 +904,7 @@ export default function TagsExplorer() {
                       }}
                       className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 cursor-pointer"
                     >
-                      ล้างตัวกรองทั้งหมด
+                      {tLocal.clearAllFilters}
                     </button>
                   </div>
                 ) : (

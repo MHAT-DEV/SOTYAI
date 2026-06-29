@@ -82,7 +82,7 @@ export default function FullMessenger({ identity }: FullMessengerProps) {
         setConversations(data);
       }
     } catch (err) {
-      console.error('Error fetching conversations:', err);
+      // Silently ignore fetch errors during dev server restarts
     }
   };
 
@@ -121,7 +121,7 @@ export default function FullMessenger({ identity }: FullMessengerProps) {
         }
       }
     } catch (err) {
-      console.error('Error fetching messages:', err);
+      // Silently ignore fetch errors during dev server restarts
     }
   };
 

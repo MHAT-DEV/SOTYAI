@@ -1,4 +1,4 @@
-import { KnowledgeObject, Identity, ActivityEvent, Account, Session, SpaceMember, SpacePost, SpaceComment, SpaceChatMessage, Report, CommunityVerificationRecord, Ticket, TicketComment, Challenge, ChallengeSubmission, TrendingGuide } from '../types.js';
+import { KnowledgeObject, Identity, ActivityEvent, Account, Session, SpaceMember, SpacePost, SpaceComment, SpaceChatMessage, Report, CommunityVerificationRecord, Ticket, TicketComment, Challenge, ChallengeSubmission, TrendingGuide, KnowledgeHistoryEvent } from '../types.js';
 
 let knowledgeStore: KnowledgeObject[] = [];
 let identityStore: Identity[] = [];
@@ -13,6 +13,7 @@ let reportStore: Report[] = [];
 let verificationRecords: CommunityVerificationRecord[] = [];
 let challengeStore: Challenge[] = [];
 let trendingGuideStore: TrendingGuide[] = [];
+let knowledgeHistoryStore: KnowledgeHistoryEvent[] = [];
 
 let ticketStore: Ticket[] = [
   {
@@ -635,6 +636,71 @@ export function initializeData() {
     }
   ];
 
+  knowledgeHistoryStore = [
+    {
+      id: 'hist_1',
+      knowledgeId: 'ko_1',
+      version: '1.0.0',
+      eventType: 'Knowledge Created',
+      timestamp: new Date(Date.now() - 3600000 * 24 * 10).toISOString(),
+      authorId: 'id_human_1',
+      authorName: 'Alice Developer',
+      identityType: 'Human',
+      commitMessage: 'Initial creation of optimal useEffect usage guide',
+      detailedDescription: 'Drafted the initial problem, context, and solution regarding React 19 useEffect changes.',
+      trustScoreAfter: 50
+    },
+    {
+      id: 'hist_2',
+      knowledgeId: 'ko_1',
+      version: '1.1.0',
+      parentVersion: '1.0.0',
+      eventType: 'Evidence Added',
+      timestamp: new Date(Date.now() - 3600000 * 24 * 8).toISOString(),
+      authorId: 'id_human_1',
+      authorName: 'Alice Developer',
+      identityType: 'Human',
+      commitMessage: 'Added production testing evidence',
+      detailedDescription: 'Included examples of race conditions eliminated using the new patterns.',
+      trustScoreBefore: 50,
+      trustScoreAfter: 65,
+      changes: {
+        added: ['evidence']
+      }
+    },
+    {
+      id: 'hist_3',
+      knowledgeId: 'ko_1',
+      version: '1.2.0',
+      parentVersion: '1.1.0',
+      eventType: 'Human Verification Approved',
+      timestamp: new Date(Date.now() - 3600000 * 24 * 3).toISOString(),
+      authorId: 'id_human_2',
+      authorName: 'Bob Coder',
+      identityType: 'Human',
+      commitMessage: 'Verified and tested successfully',
+      verificationStatus: 'Passed',
+      trustScoreBefore: 65,
+      trustScoreAfter: 75
+    },
+    {
+      id: 'hist_4',
+      knowledgeId: 'ko_1',
+      version: '1.2.1',
+      parentVersion: '1.2.0',
+      eventType: 'Code Modified',
+      timestamp: new Date(Date.now() - 3600000 * 24 * 1).toISOString(),
+      authorId: 'id_agent_1',
+      authorName: 'Code Refactor Bot',
+      identityType: 'AI',
+      aiModel: 'Gemini 1.5 Pro',
+      commitMessage: 'Updated code snippets for React 19 final release syntax',
+      changes: {
+        modified: ['solution']
+      }
+    }
+  ];
+
   challengeStore = [
     {
       id: 'challenge_1',
@@ -858,6 +924,12 @@ export function getKnowledge(query?: string) {
 
 export function getKnowledgeById(id: string) {
   return knowledgeStore.find(k => k.id === id);
+}
+
+export function getKnowledgeHistory(knowledgeId: string) {
+  return knowledgeHistoryStore
+    .filter(h => h.knowledgeId === knowledgeId)
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 }
 
 export function getSubscriptions(accountId: string) {

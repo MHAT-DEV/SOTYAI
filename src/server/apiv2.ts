@@ -3,6 +3,7 @@ import { GoogleGenAI } from '@google/genai';
 import { 
   getKnowledge, 
   getKnowledgeById, 
+  getKnowledgeHistory,
   getIdentities, 
   getIdentityById, 
   getActivities, 
@@ -645,6 +646,16 @@ export function registerApiV2(app: express.Express) {
 
     setCachedData(cacheKey, enriched, 30000); // 30s cache TTL
     res.json(enriched);
+  });
+
+  app.get('/api/v2/knowledge/:id/history', (req, res) => {
+    const id = req.params.id;
+    const history = getKnowledgeHistory(id);
+    if (history && history.length > 0) {
+      res.json(history);
+    } else {
+      res.json([]);
+    }
   });
 
   app.get('/api/v2/knowledge/:id', (req, res) => {

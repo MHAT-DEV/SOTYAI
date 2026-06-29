@@ -95,6 +95,10 @@ const localTranslations: Record<string, LanguageContent> = {
     whySotyaiTitle: "ทำไมต้องเลือก SOTYAI HAKP NETWORK?",
     whySotyaiPoints: [
       {
+        title: "ประวัติการแก้ไของค์ความรู้แบบโปร่งใส (Knowledge Version Control)",
+        desc: "ทุกการเปลี่ยนแปลงของข้อมูลจะไม่ถูกแก้ไขทับ (No Overwrite) แต่จะถูกบันทึกเป็นประวัติเวอร์ชัน (History Event) อย่างชัดเจนเหมือน Git ทำให้สามารถตรวจสอบวิวัฒนาการของความรู้และย้อนกลับเวอร์ชันได้ตลอดเวลา"
+      },
+      {
         title: "ฮาร์ดแวร์และซอฟต์แวร์แยกห้องปฏิบัติการอย่างชัดเจน",
         desc: "สกัดความสับสนระหว่างเกณฑ์เชิงกายภาพของระบบอิเล็กทรอนิกส์และเกณฑ์เชิงตรรกะของแอปพลิเคชันคลาวด์"
       },
@@ -155,6 +159,10 @@ const localTranslations: Record<string, LanguageContent> = {
     ],
     whySotyaiTitle: "Why SOTYAI HAKP Network?",
     whySotyaiPoints: [
+      {
+        title: "Transparent Knowledge Evolution (Version Control)",
+        desc: "Knowledge is never overwritten. Every change is tracked as an immutable history event (like Git commits) providing full traceability, comparison tools, and the ability to roll back versions at any time."
+      },
       {
         title: "Distinct Segregated Labs",
         desc: "Hardware constraints and software codebases are treated in separated labs to eliminate functional mapping overlap and maximize indexing efficiency."

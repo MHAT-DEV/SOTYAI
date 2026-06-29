@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { KnowledgeObject, Identity } from '../types';
-import { Shield, Clock, CheckCircle2, BookOpen, Code, FileJson, Link as LinkIcon, User, Bot, AlertTriangle, FileText, Share2, Quote, Network, Tag, ThumbsUp, Bookmark } from 'lucide-react';
+import { Shield, Clock, CheckCircle2, BookOpen, Code, FileJson, Link as LinkIcon, User, Bot, AlertTriangle, FileText, Share2, Quote, Network, Tag, ThumbsUp, Bookmark, History } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { formatDistanceToNow } from 'date-fns';
 import ReportModal from './ReportModal';
@@ -15,9 +15,10 @@ interface KnowledgeDetailProps {
 export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
   const { id } = useParams<{ id: string }>();
   const [ko, setKo] = useState<KnowledgeObject | null>(null);
+  const [historyEvents, setHistoryEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'human' | 'ai'>('human');
-  const [activeHumanTab, setActiveHumanTab] = useState<'content' | 'trust' | 'citations'>('content');
+  const [activeHumanTab, setActiveHumanTab] = useState<'content' | 'trust' | 'citations' | 'history'>('content');
   const [activeAiTab, setActiveAiTab] = useState<'json' | 'markdown' | 'mcp'>('json');
 
   const [isFollowing, setIsFollowing] = useState(false);
@@ -80,6 +81,13 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
         setKo(data);
         setLoading(false);
       });
+    
+    fetch(`/api/v2/knowledge/${id}/history`)
+      .then(res => res.json())
+      .then(data => {
+        setHistoryEvents(data);
+      })
+      .catch(err => console.error('Error fetching history:', err));
     
     fetchVerifications();
   }, [id]);
@@ -287,6 +295,12 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                   className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${activeHumanTab === 'citations' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
                 >
                   <Quote className="w-4 h-4" /> Citations
+                </button>
+                <button 
+                  onClick={() => setActiveHumanTab('history')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${activeHumanTab === 'history' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                >
+                  <History className="w-4 h-4" /> History
                 </button>
               </div>
             </div>
@@ -856,6 +870,88 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
             ))}
           </div>
         )}
+
+            {/* HISTORY TAB */}
+            {activeHumanTab === 'history' && (
+              <div className="max-w-4xl mx-auto animate-in fade-in duration-300">
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                      <History className="w-5 h-5 text-slate-500" /> Knowledge History (Version Control)
+                    </h2>
+                    <p className="text-sm text-slate-500 mt-1">Timeline of changes, verifications, and trust score evolution.</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                  {historyEvents.length > 0 ? historyEvents.map((evt: any, idx: number) => (
+                    <div key={evt.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                      {/* Timeline dot */}
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-blue-100 text-blue-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                        {evt.identityType === 'Human' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                      </div>
+                      
+                      <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl bg-white border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{evt.eventType}</span>
+                          <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">v{evt.version}</span>
+                        </div>
+                        
+                        <h3 className="font-bold text-slate-900 text-sm mb-1">{evt.commitMessage}</h3>
+                        
+                        {evt.detailedDescription && (
+                          <p className="text-xs text-slate-600 mb-3 leading-relaxed">
+                            {evt.detailedDescription}
+                          </p>
+                        )}
+
+                        {evt.changes && (
+                          <div className="mb-3 space-y-1">
+                            {evt.changes.added?.map((item: string, i: number) => (
+                              <div key={i} className="text-[10px] font-mono text-green-700 bg-green-50 border border-green-100 px-2 py-1 rounded inline-flex mr-1 mb-1">+ {item}</div>
+                            ))}
+                            {evt.changes.removed?.map((item: string, i: number) => (
+                              <div key={i} className="text-[10px] font-mono text-red-700 bg-red-50 border border-red-100 px-2 py-1 rounded inline-flex mr-1 mb-1">- {item}</div>
+                            ))}
+                            {evt.changes.modified?.map((item: string, i: number) => (
+                              <div key={i} className="text-[10px] font-mono text-amber-700 bg-amber-50 border border-amber-100 px-2 py-1 rounded inline-flex mr-1 mb-1">~ {item}</div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
+                          <div className="flex items-center gap-2">
+                            <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[8px] font-bold text-slate-600">
+                              {evt.authorName.charAt(0)}
+                            </div>
+                            <span className="text-xs font-medium text-slate-700">{evt.authorName}</span>
+                            {evt.aiModel && <span className="text-[9px] text-slate-400 font-mono bg-slate-100 px-1.5 py-0.5 rounded">via {evt.aiModel}</span>}
+                          </div>
+                          
+                          <div className="text-[10px] text-slate-400 font-medium">
+                            {formatDistanceToNow(new Date(evt.timestamp), { addSuffix: true })}
+                          </div>
+                        </div>
+
+                        {(evt.trustScoreBefore || evt.trustScoreAfter) && (
+                          <div className="mt-3 bg-slate-50 border border-slate-100 rounded-lg p-2 flex items-center justify-between">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase">Trust Impact</span>
+                            <div className="flex items-center gap-1.5 text-xs font-mono font-bold">
+                              {evt.trustScoreBefore && <span className="text-slate-400">{evt.trustScoreBefore}</span>}
+                              {evt.trustScoreBefore && evt.trustScoreAfter && <span className="text-slate-300">→</span>}
+                              {evt.trustScoreAfter && <span className={evt.trustScoreAfter > (evt.trustScoreBefore || 0) ? 'text-green-600' : 'text-red-600'}>{evt.trustScoreAfter}</span>}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="text-center py-12 text-slate-500 text-sm">No history available for this knowledge object yet.</div>
+                  )}
+                </div>
+              </div>
+            )}
+
       </div>
     </div>
   ) : (

@@ -199,6 +199,29 @@ export interface SpaceChatMessage {
   timestamp: string;
 }
 
+export interface KnowledgeHistoryEvent {
+  id: string;
+  knowledgeId: string;
+  version: string;
+  parentVersion?: string;
+  eventType: string;
+  timestamp: string;
+  authorId: string;
+  authorName: string;
+  identityType: 'Human' | 'AI' | 'Organization';
+  aiModel?: string;
+  commitMessage: string;
+  detailedDescription?: string;
+  trustScoreBefore?: number;
+  trustScoreAfter?: number;
+  verificationStatus?: string;
+  changes?: {
+    added?: string[];
+    removed?: string[];
+    modified?: string[];
+  };
+}
+
 export interface Report {
   id: string;
   targetType: 'KnowledgeObject' | 'SpacePost' | 'SpaceComment' | 'Identity';

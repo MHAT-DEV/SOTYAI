@@ -42,58 +42,344 @@ interface LocalTranslation {
   reportContent: string;
   selectIdentityToVerify: string;
   noVerificationLogs: string;
+  viewAsHuman: string;
+  viewAsAI: string;
+  tabContent: string;
+  tabTrust: string;
+  tabCitations: string;
+  tabHistory: string;
+  tabSandbox: string;
+  tabChecklist: string;
+  tabConsensus: string;
+  tabDebates: string;
+  titleClaim: string;
+  titleContext: string;
+  titleRequirements: string;
+  titleSolution: string;
+  titleAdvantages: string;
+  titleDisadvantages: string;
+  titleAlternatives: string;
+  titleWarning: string;
+  titleResult: string;
+  authorBoxTitle: string;
+  authorBoxSub: string;
+  btnFollowing: string;
+  btnFollow: string;
+  btnNotify: string;
+  titleSources: string;
+  sandboxCodeAndEnv: string;
 }
 
 const localTranslations: Record<string, LocalTranslation> = {
   en: {
     reportContent: 'Report Content',
     selectIdentityToVerify: 'Please select your Identity at the top menu to verify as a real Verifier.',
-    noVerificationLogs: 'No verification logs registered yet.'
+    noVerificationLogs: 'No verification logs registered yet.',
+    viewAsHuman: "Human Interface",
+    viewAsAI: "AI Console (JSON/MCP)",
+    tabContent: "Knowledge Body",
+    tabTrust: "Trust Index",
+    tabCitations: "Citations",
+    tabHistory: "Revision History",
+    tabSandbox: "Ephemeral Sandbox",
+    tabChecklist: "Validation Checklist",
+    tabConsensus: "Consensus Audit",
+    tabDebates: "Contradiction Matrix",
+    titleClaim: "The Claim / Thesis",
+    titleContext: "Background Context",
+    titleRequirements: "Technical Requirements",
+    titleSolution: "Implementation & Solution",
+    titleAdvantages: "Advantages & Pros",
+    titleDisadvantages: "Disadvantages & Cons",
+    titleAlternatives: "Alternative Solutions",
+    titleWarning: "Security Alerts & Warnings",
+    titleResult: "Validation Results",
+    authorBoxTitle: "Verified Contributor",
+    authorBoxSub: "SOTYAI Certified Expert",
+    btnFollowing: "Following",
+    btnFollow: "Follow Author",
+    btnNotify: "Notify on updates",
+    titleSources: "Sources & References",
+    sandboxCodeAndEnv: "Executable Sandbox Code & Environment Config"
   },
   th: {
     reportContent: 'รายงานเนื้อหา (Report)',
-    selectIdentityToVerify: 'กรุณาเลือก Identity ของคุณที่แถบเมนูด้านบนก่อนเพื่อลงชื่อรับรองในฐานะ Verifier จริง (Please select your Identity at the top menu to verify).',
-    noVerificationLogs: 'ยังไม่มีการบันทึกหลักฐานการตรวจสอบ (No verification logs registered yet).'
+    selectIdentityToVerify: 'กรุณาเลือก Identity ของคุณที่แถบเมนูด้านบนก่อนเพื่อลงชื่อรับรองในฐานะ Verifier จริง',
+    noVerificationLogs: 'ยังไม่มีการบันทึกหลักฐานการตรวจสอบ',
+    viewAsHuman: "มุมมองสำหรับมนุษย์",
+    viewAsAI: "คอนโซล AI (AI Console)",
+    tabContent: "เนื้อหาหลัก",
+    tabTrust: "คะแนนความน่าเชื่อถือ",
+    tabCitations: "การอ้างอิงและประวัติ",
+    tabHistory: "ประวัติการแก้ไข",
+    tabSandbox: "สนามทดสอบ Sandbox",
+    tabChecklist: "รายการตรวจสอบ (Checklist)",
+    tabConsensus: "มติเอกฉันท์ (Consensus)",
+    tabDebates: "ข้อพิพาทและมุมมองต่าง",
+    titleClaim: "ประเด็นข้อเสนอ/ปัญหาวิกฤต",
+    titleContext: "บริบททางเทคนิคและสภาวการณ์",
+    titleRequirements: "ข้อกำหนดทางอรรถประโยชน์",
+    titleSolution: "ขั้นตอนการแก้ปัญหาและบล็อกคำสั่ง",
+    titleAdvantages: "ข้อดีและประโยชน์",
+    titleDisadvantages: "ข้อจำกัดและข้อเสีย",
+    titleAlternatives: "แนวทางเลือกอื่นที่แนะนำ",
+    titleWarning: "ข้อควรระวัง/ความเสี่ยงความมั่นคง",
+    titleResult: "ผลลัพธ์และความคืบหน้า",
+    authorBoxTitle: "ผู้ร่วมแบ่งปันความรู้",
+    authorBoxSub: "ผู้เชี่ยวชาญที่ได้รับการรับรองระบบ SOTYAI",
+    btnFollowing: "กำลังติดตาม",
+    btnFollow: "ติดตามผู้สร้าง",
+    btnNotify: "แจ้งเตือนเมื่ออัปเดต",
+    titleSources: "แหล่งข้อมูลและเอกสารอ้างอิง",
+    sandboxCodeAndEnv: "โค้ดสำหรับรัน Sandbox และการตั้งค่าสภาพแวดล้อม"
   },
   ja: {
-    reportContent: 'コンテンツを報告 (Report)',
+    reportContent: 'コンテンツを報告',
     selectIdentityToVerify: '実際のベリファイアとして署名するには、上部メニューでアイデンティティを選択してください。',
-    noVerificationLogs: 'まだ検証ログが登録されていません。'
+    noVerificationLogs: '検証ログはまだ登録されていません。',
+    viewAsHuman: "人間用ビュー",
+    viewAsAI: "AIコンソール (JSON/MCP)",
+    tabContent: "ナレッジ本文",
+    tabTrust: "信頼度スコア",
+    tabCitations: "引用関係",
+    tabHistory: "改訂履歴",
+    tabSandbox: "検証サンドボックス",
+    tabChecklist: "検証チェックリスト",
+    tabConsensus: "合意形成プロセス",
+    tabDebates: "対立議論マトリクス",
+    titleClaim: "主張 / 定理",
+    titleContext: "背景と前提条件",
+    titleRequirements: "技術仕様要求",
+    titleSolution: "実装とソリューション",
+    titleAdvantages: "メリットと利点",
+    titleDisadvantages: "デメリットと制限",
+    titleAlternatives: "代替解決策",
+    titleWarning: "セキュリティ警告と注意",
+    titleResult: "検証結果と結論",
+    authorBoxTitle: "確認済み執筆者",
+    authorBoxSub: "SOTYAI認定エキスパート",
+    btnFollowing: "フォロー中",
+    btnFollow: "執筆者をフォロー",
+    btnNotify: "更新を通知する",
+    titleSources: "参照ソースと引用文献",
+    sandboxCodeAndEnv: "Sandbox実行可能コードと環境設定"
   },
   zh: {
-    reportContent: '报告内容 (Report)',
+    reportContent: '举报/报告内容',
     selectIdentityToVerify: '请先在顶部菜单中选择您的身份，以便作为真正的验证者进行签名。',
-    noVerificationLogs: '尚未注册任何验证日志。'
+    noVerificationLogs: '尚未注册任何验证日志。',
+    viewAsHuman: "人类视图界面",
+    viewAsAI: "AI 核心控制台 (JSON/MCP)",
+    tabContent: "知识主体",
+    tabTrust: "可信度评估",
+    tabCitations: "交叉引用",
+    tabHistory: "修改版本历史",
+    tabSandbox: "隔离运行沙箱",
+    tabChecklist: "验证核对清单",
+    tabConsensus: "共识决策审计",
+    tabDebates: "矛盾对抗矩阵",
+    titleClaim: "核心主张 / 问题定义",
+    titleContext: "背景技术环境",
+    titleRequirements: "硬性技术指标要求",
+    titleSolution: "解决方案与核心指令",
+    titleAdvantages: "方案优势与特性",
+    titleDisadvantages: "潜在局限与缺陷",
+    titleAlternatives: "替代性推荐路线",
+    titleWarning: "系统安全与防护预警",
+    titleResult: "有效性验证结果",
+    authorBoxTitle: "经认证的知识贡献者",
+    authorBoxSub: "SOTYAI 体系专家评级",
+    btnFollowing: "已关注",
+    btnFollow: "关注贡献者",
+    btnNotify: "有新动态时通知我",
+    titleSources: "数据来源与参考文献",
+    sandboxCodeAndEnv: "沙箱可执行代码与环境配置"
   },
   ko: {
-    reportContent: '콘텐츠 신고 (Report)',
+    reportContent: '콘텐츠 신고',
     selectIdentityToVerify: '실제 검증자로 서명하려면 먼저 상단 메뉴에서 신원을 선택하십시오.',
-    noVerificationLogs: '아직 등록된 검증 로그가 없습니다.'
+    noVerificationLogs: '등록된 검증 로그가 아직 없습니다.',
+    viewAsHuman: "일반 사용자 뷰",
+    viewAsAI: "AI 콘솔 (JSON/MCP)",
+    tabContent: "지식 본문",
+    tabTrust: "신뢰지수 지표",
+    tabCitations: "인용 관계망",
+    tabHistory: "수정 내역 및 버전",
+    tabSandbox: "일회성 샌드박스",
+    tabChecklist: "검증 체크리스트",
+    tabConsensus: "합의 오딧팅",
+    tabDebates: "반론 및 논쟁 매트릭스",
+    titleClaim: "핵심 주장 / 문제 제기",
+    titleContext: "기술적 배경 상황",
+    titleRequirements: "아키텍처 요구 사양",
+    titleSolution: "구현 및 솔루션",
+    titleAdvantages: "장점 및 기대 효과",
+    titleDisadvantages: "단점 및 기술 제약",
+    titleAlternatives: "대체 가능한 제안",
+    titleWarning: "보안 주의 및 경고",
+    titleResult: "검증 확인 결과",
+    authorBoxTitle: "검증된 기여자",
+    authorBoxSub: "SOTYAI 공인 전문가",
+    btnFollowing: "팔로잉",
+    btnFollow: "작성자 팔로우",
+    btnNotify: "업데이트 알림 받기",
+    titleSources: "출처 및 참고 문헌",
+    sandboxCodeAndEnv: "샌드박스 실행 가능 코드 및 환경 설정"
   },
   de: {
-    reportContent: 'Inhalt melden (Report)',
+    reportContent: 'Inhalt melden',
     selectIdentityToVerify: 'Bitte wählen Sie zuerst Ihre Identität im oberen Menü, um als echter Verifizierer zu unterzeichnen.',
-    noVerificationLogs: 'Noch keine Verifizierungsprotokolle registriert.'
+    noVerificationLogs: 'Noch keine Verifizierungsprotokolle registriert.',
+    viewAsHuman: "Benutzeroberfläche (Human)",
+    viewAsAI: "AI Konsole (JSON/MCP)",
+    tabContent: "Inhalt & Wissen",
+    tabTrust: "Vertrauensindex",
+    tabCitations: "Zitierungen",
+    tabHistory: "Revisionsverlauf",
+    tabSandbox: "Verifikations-Sandbox",
+    tabChecklist: "Validierungs-Checkliste",
+    tabConsensus: "Konsens-Audit",
+    tabDebates: "Debatten-Matrix",
+    titleClaim: "Hauptthese / Problemstellung",
+    titleContext: "Technischer Kontext",
+    titleRequirements: "Systemanforderungen",
+    titleSolution: "Lösung & Implementierung",
+    titleAdvantages: "Vorteile & Nutzen",
+    titleDisadvantages: "Nachteile & Einschränkungen",
+    titleAlternatives: "Alternative Ansätze",
+    titleWarning: "Sicherheitshinweise & Warnungen",
+    titleResult: "Validierungsergebnis",
+    authorBoxTitle: "Verifizierter Autor",
+    authorBoxSub: "Zertifizierter SOTYAI-Experte",
+    btnFollowing: "Abonniert",
+    btnFollow: "Autor folgen",
+    btnNotify: "Bei Updates benachrichtigen",
+    titleSources: "Quellen & Referenzen",
+    sandboxCodeAndEnv: "Ausführbarer Sandbox-Code & Umgebungskonfiguration"
   },
   fr: {
-    reportContent: 'Signaler le contenu (Report)',
+    reportContent: 'Signaler le contenu',
     selectIdentityToVerify: 'Veuillez d\'abord sélectionner votre identité dans le menu supérieur pour signer en tant que vrai vérificateur.',
-    noVerificationLogs: 'Aucun journal de vérification enregistré pour le moment.'
+    noVerificationLogs: 'Aucun journal de vérification enregistré pour le moment.',
+    viewAsHuman: "Interface Humaine",
+    viewAsAI: "Console IA (JSON/MCP)",
+    tabContent: "Corps du Savoir",
+    tabTrust: "Indice de Confiance",
+    tabCitations: "Citations",
+    tabHistory: "Historique des révisions",
+    tabSandbox: "Sandbox Éphémère",
+    tabChecklist: "Checklist de Validation",
+    tabConsensus: "Audit de Consensus",
+    tabDebates: "Matrice de Contradiction",
+    titleClaim: "La Thèse / Le Problème",
+    titleContext: "Contexte Technique",
+    titleRequirements: "Exigences Techniques",
+    titleSolution: "Solution & Code",
+    titleAdvantages: "Avantages & Atouts",
+    titleDisadvantages: "Inconvénients & Limites",
+    titleAlternatives: "Solutions Alternatives",
+    titleWarning: "Alertes de Sécurité",
+    titleResult: "Résultats de Validation",
+    authorBoxTitle: "Contributeur Vérifié",
+    authorBoxSub: "Expert Certifié SOTYAI",
+    btnFollowing: "Abonné",
+    btnFollow: "Suivre l'auteur",
+    btnNotify: "Notifier lors de mises à jour",
+    titleSources: "Sources & Références",
+    sandboxCodeAndEnv: "Code Exécutable Sandbox & Configuration de l'Environnement"
   },
   es: {
-    reportContent: 'Reportar Contenido (Report)',
+    reportContent: 'Reportar Contenido',
     selectIdentityToVerify: 'Por favor, seleccione su Identidad en el menú superior primero para firmar como un Verificador real.',
-    noVerificationLogs: 'No hay registros de verificación registrados todavía.'
+    noVerificationLogs: 'No hay registros de verificación registrados todavía.',
+    viewAsHuman: "Vista de Humano",
+    viewAsAI: "Consola de IA (JSON/MCP)",
+    tabContent: "Cuerpo del Conocimiento",
+    tabTrust: "Índice de Confianza",
+    tabCitations: "Citas y Fuentes",
+    tabHistory: "Historial de Revisiones",
+    tabSandbox: "Sandbox Efímero",
+    tabChecklist: "Lista de Validación",
+    tabConsensus: "Auditoría de Consenso",
+    tabDebates: "Matriz de Contradicciones",
+    titleClaim: "La Tesis / El Problema",
+    titleContext: "Contexto de Fondo",
+    titleRequirements: "Requisitos Técnicos",
+    titleSolution: "Solución e Implementación",
+    titleAdvantages: "Ventajas y Pros",
+    titleDisadvantages: "Desventajas y Contras",
+    titleAlternatives: "Soluciones Alternativas",
+    titleWarning: "Advertencias de Seguridad",
+    titleResult: "Resultados de Validación",
+    authorBoxTitle: "Colaborador Verificado",
+    authorBoxSub: "Experto Certificado SOTYAI",
+    btnFollowing: "Siguiendo",
+    btnFollow: "Seguir al Autor",
+    btnNotify: "Notificar actualizaciones",
+    titleSources: "Fuentes y Referencias",
+    sandboxCodeAndEnv: "Código Ejecutable de Sandbox y Configuración de Entorno"
   },
   ru: {
-    reportContent: 'Пожаловаться на контент (Report)',
+    reportContent: 'Пожаловаться на контент',
     selectIdentityToVerify: 'Пожалуйста, сначала выберите свою Личность в верхнем меню, чтобы подписаться как настоящий Верификатор.',
-    noVerificationLogs: 'Журналы верификации пока не зарегистрированы.'
+    noVerificationLogs: 'Журналы верификации пока не зарегистрированы.',
+    viewAsHuman: "Интерфейс Человека",
+    viewAsAI: "Консоль ИИ (JSON/MCP)",
+    tabContent: "Суть Знания",
+    tabTrust: "Индекс Доверия",
+    tabCitations: "Матрица Цитирования",
+    tabHistory: "История изменений",
+    tabSandbox: "Изолированная Песочница",
+    tabChecklist: "Чек-лист Валидации",
+    tabConsensus: "Консенсусный Аудит",
+    tabDebates: "Матрица Противоречий",
+    titleClaim: "Тезис / Суть проблемы",
+    titleContext: "Технический Контекст",
+    titleRequirements: "Технические Требования",
+    titleSolution: "Решение и Реализация",
+    titleAdvantages: "Преимущества и Плюсы",
+    titleDisadvantages: "Недостатки и Ограничения",
+    titleAlternatives: "Альтернативные Решения",
+    titleWarning: "Предупреждения по Безопасности",
+    titleResult: "Результаты Валидации",
+    authorBoxTitle: "Проверенный Автор",
+    authorBoxSub: "Сертифицированный Эксперт SOTYAI",
+    btnFollowing: "Вы подписаны",
+    btnFollow: "Подписаться на автора",
+    btnNotify: "Уведомлять об обновлениях",
+    titleSources: "Источники и Ссылки",
+    sandboxCodeAndEnv: "Исполняемый код песочницы и конфигурация среды"
   },
   vi: {
-    reportContent: 'Báo cáo nội dung (Report)',
+    reportContent: 'Báo cáo nội dung',
     selectIdentityToVerify: 'Vui lòng chọn Danh tính của bạn ở menu trên cùng trước để ký với tư cách là Người xác minh thực.',
-    noVerificationLogs: 'Chưa có nhật ký xác minh nào được đăng ký.'
+    noVerificationLogs: 'Chưa có nhật ký xác minh nào được đăng ký.',
+    viewAsHuman: "Giao diện Con người",
+    viewAsAI: "Bảng điều khiển AI (JSON/MCP)",
+    tabContent: "Nội dung Tri thức",
+    tabTrust: "Chỉ số Tin cậy",
+    tabCitations: "Trích dẫn",
+    tabHistory: "Lịch sử Chỉnh sửa",
+    tabSandbox: "Hộp cát Thử nghiệm (Sandbox)",
+    tabChecklist: "Danh sách Kiểm định",
+    tabConsensus: "Kiểm toán Đồng thuận",
+    tabDebates: "Ma trận Phản biện",
+    titleClaim: "Luận điểm / Vấn đề",
+    titleContext: "Bối cảnh Kỹ thuật",
+    titleRequirements: "Yêu cầu Hệ thống",
+    titleSolution: "Giải pháp & Mã nguồn",
+    titleAdvantages: "Ưu điểm & Lợi ích",
+    titleDisadvantages: "Nhược điểm & Hạn chế",
+    titleAlternatives: "Giải pháp Thay thế",
+    titleWarning: "Cảnh báo Bảo mật",
+    titleResult: "Kết quả Kiểm định",
+    authorBoxTitle: "Người đóng góp Xác thực",
+    authorBoxSub: "Chuyên gia Chứng nhận SOTYAI",
+    btnFollowing: "Đang theo dõi",
+    btnFollow: "Theo dõi tác giả",
+    btnNotify: "Thông báo khi cập nhật",
+    titleSources: "Nguồn & Trích dẫn",
+    sandboxCodeAndEnv: "Mã nguồn thử nghiệm Sandbox & Cấu hình môi trường"
   }
 };
 
@@ -111,7 +397,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"human" | "ai">("human");
   const [activeHumanTab, setActiveHumanTab] = useState<
-    "content" | "trust" | "citations" | "history" | "sandbox" | "checklist" | "consensus"
+    "content" | "trust" | "citations" | "history" | "sandbox" | "checklist" | "consensus" | "debates"
   >("content");
   const [activeAiTab, setActiveAiTab] = useState<"json" | "markdown" | "mcp">(
     "json",
@@ -139,16 +425,20 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
 
   useEffect(() => {
     if (ko) {
-      const fullContent = `${ko.problem}\n${ko.context}\n${ko.solution}\n${ko.evidence}`;
-      const match = fullContent.match(
-        /```(?:javascript|js|html|react|python|typescript|ts)?\n([\s\S]*?)```/,
-      );
-      if (match && match[1]) {
-        setSandboxCode(match[1]);
+      if (ko.code && ko.code.trim()) {
+        setSandboxCode(ko.code);
       } else {
-        setSandboxCode(
-          '// No executable code block found in knowledge object.\nconsole.log("Empty Sandbox environment ready.");',
+        const fullContent = `${ko.problem}\n${ko.context}\n${ko.solution}\n${ko.evidence}`;
+        const match = fullContent.match(
+          /```(?:javascript|js|html|react|python|typescript|ts)?\n([\s\S]*?)```/,
         );
+        if (match && match[1]) {
+          setSandboxCode(match[1]);
+        } else {
+          setSandboxCode(
+            '// No executable code block found in knowledge object.\nconsole.log("Empty Sandbox environment ready.");',
+          );
+        }
       }
     }
   }, [ko]);
@@ -537,13 +827,13 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
             onClick={() => setViewMode("human")}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${viewMode === "human" ? "bg-white text-slate-900 shadow-md" : "text-slate-600 hover:text-slate-900"}`}
           >
-            <User className="w-4 h-4" /> Human View
+            <User className="w-4 h-4" /> {tLocal.viewAsHuman}
           </button>
           <button
             onClick={() => setViewMode("ai")}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${viewMode === "ai" ? "bg-slate-900 text-green-400 shadow-md" : "text-slate-600 hover:text-slate-900"}`}
           >
-            <Bot className="w-4 h-4" /> AI Agent View
+            <Bot className="w-4 h-4" /> {tLocal.viewAsAI}
           </button>
         </div>
       </div>
@@ -586,32 +876,32 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                     onClick={() => setActiveHumanTab("content")}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${activeHumanTab === "content" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
                   >
-                    <BookOpen className="w-4 h-4" /> Read
+                    <BookOpen className="w-4 h-4" /> {tLocal.tabContent}
                   </button>
                   <button
                     onClick={() => setActiveHumanTab("citations")}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${activeHumanTab === "citations" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
                   >
-                    <Quote className="w-4 h-4" /> Citations
+                    <Quote className="w-4 h-4" /> {tLocal.tabCitations}
                   </button>
                   <button
                     onClick={() => setActiveHumanTab("history")}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${activeHumanTab === "history" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
                   >
-                    <History className="w-4 h-4" /> History
+                    <History className="w-4 h-4" /> {tLocal.tabHistory}
                   </button>
                   <button
                     onClick={() => setActiveHumanTab("debates")}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${activeHumanTab === "debates" ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
                   >
-                    <Activity className="w-4 h-4" /> Debates
+                    <Activity className="w-4 h-4" /> {tLocal.tabDebates}
                   </button>
                   {(!ko.knowledgeType || ko.knowledgeType === 'CODE') && (
                     <button
                       onClick={() => setActiveHumanTab("sandbox")}
                       className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${activeHumanTab === "sandbox" ? "bg-amber-100 text-amber-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
                     >
-                      <Beaker className="w-4 h-4" /> Sandbox
+                      <Beaker className="w-4 h-4" /> {tLocal.tabSandbox}
                     </button>
                   )}
                   {ko.knowledgeType === 'CONFIG' && (
@@ -619,7 +909,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                       onClick={() => setActiveHumanTab("checklist")}
                       className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${activeHumanTab === "checklist" ? "bg-emerald-100 text-emerald-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
                     >
-                      <CheckCircle2 className="w-4 h-4" /> Validation Checklist
+                      <CheckCircle2 className="w-4 h-4" /> {tLocal.tabChecklist}
                     </button>
                   )}
                   {ko.knowledgeType === 'DISCOURSE' && (
@@ -627,7 +917,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                       onClick={() => setActiveHumanTab("consensus")}
                       className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-all ${activeHumanTab === "consensus" ? "bg-purple-100 text-purple-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
                     >
-                      <PieChart className="w-4 h-4" /> Consensus
+                      <PieChart className="w-4 h-4" /> {tLocal.tabConsensus}
                     </button>
                   )}
                 </div>
@@ -711,7 +1001,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                     <section>
                       <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4 text-amber-500" />
-                        {ko.knowledgeType === 'DISCOURSE' ? 'Claim / Thesis' : ko.knowledgeType === 'CONFIG' ? 'System Context' : 'The Problem'}
+                        {tLocal.titleClaim}
                       </h3>
                       <div className="text-slate-800 text-lg leading-relaxed bg-amber-50/50 p-5 rounded-xl border border-amber-100/50">
                         {ko.problem}
@@ -722,7 +1012,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                   {ko.context && (
                     <section>
                       <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
-                        {ko.knowledgeType === 'DISCOURSE' ? 'Background Context' : 'Context'}
+                        {tLocal.titleContext}
                       </h3>
                       <div className="prose prose-slate max-w-none text-slate-700">
                         <Markdown>{ko.context}</Markdown>
@@ -733,7 +1023,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                   {ko.requirements && (
                     <section>
                       <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
-                        Requirements
+                        {tLocal.titleRequirements}
                       </h3>
                       <div className="prose prose-slate max-w-none text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-100">
                         <Markdown>{ko.requirements}</Markdown>
@@ -745,7 +1035,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                     <section>
                       <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-green-500" />{" "}
-                        {ko.knowledgeType === 'DISCOURSE' ? 'Main Argument' : ko.knowledgeType === 'CONFIG' ? 'Setup Steps' : 'Solution'}
+                        {tLocal.titleSolution}
                       </h3>
                       <div className="prose prose-slate max-w-none bg-green-50/30 p-6 rounded-xl border border-green-100/50">
                         <Markdown>{ko.solution}</Markdown>
@@ -758,7 +1048,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                       {ko.advantages && (
                         <section className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
                           <h3 className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-2">
-                            Advantages
+                            {tLocal.titleAdvantages}
                           </h3>
                           <div className="text-sm text-slate-700">
                             <Markdown>{ko.advantages}</Markdown>
@@ -768,7 +1058,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                       {ko.disadvantages && (
                         <section className="bg-red-50/30 p-4 rounded-xl border border-red-100">
                           <h3 className="text-xs font-bold uppercase tracking-widest text-red-600 mb-2">
-                            Disadvantages
+                            {tLocal.titleDisadvantages}
                           </h3>
                           <div className="text-sm text-slate-700">
                             <Markdown>{ko.disadvantages}</Markdown>
@@ -781,7 +1071,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                   {ko.alternatives && (
                     <section>
                       <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
-                        Alternatives
+                        {tLocal.titleAlternatives}
                       </h3>
                       <div className="prose prose-sm max-w-none text-slate-600">
                         <Markdown>{ko.alternatives}</Markdown>
@@ -794,7 +1084,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                       <AlertTriangle className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
                       <div>
                         <h3 className="text-xs font-bold uppercase tracking-widest text-orange-800 mb-1">
-                          Warning
+                          {tLocal.titleWarning}
                         </h3>
                         <div className="text-sm text-orange-900">
                           <Markdown>{ko.warning}</Markdown>
@@ -806,7 +1096,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                   {ko.result && (
                     <section>
                       <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
-                        Result & Conclusion
+                        {tLocal.titleResult}
                       </h3>
                       <div className="text-slate-800 font-medium">
                         <Markdown>{ko.result}</Markdown>
@@ -819,11 +1109,30 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                     </section>
                   )}
 
+                  {ko.code && (!ko.knowledgeType || ko.knowledgeType === 'CODE') && (
+                    <section className="bg-slate-900 text-slate-100 rounded-xl border border-slate-800 overflow-hidden shadow-md">
+                      <div className="bg-slate-800/80 px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-400">
+                          <Code className="w-4 h-4 text-amber-400" />
+                          <span>{tLocal.sandboxCodeAndEnv}</span>
+                        </div>
+                        {ko.sandboxEnv && (
+                          <span className="bg-slate-750 text-slate-300 text-[10px] font-mono px-2 py-0.5 rounded border border-slate-700 font-extrabold uppercase tracking-wide">
+                            {ko.sandboxEnv}
+                          </span>
+                        )}
+                      </div>
+                      <div className="p-5 font-mono text-xs overflow-x-auto leading-relaxed max-h-80 select-text">
+                        <pre className="whitespace-pre-wrap">{ko.code}</pre>
+                      </div>
+                    </section>
+                  )}
+
                   {/* Author Box */}
                   <div className="mt-12 bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-sm">
                     <div className="flex flex-col">
                       <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
-                        Author / Contributor
+                        {tLocal.authorBoxTitle}
                       </span>
                       <Link
                         to={`/identity/${ko.authorId}`}
@@ -836,7 +1145,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                             : ko.authorId}
                       </Link>
                       <span className="text-sm font-medium text-slate-600 mt-0.5">
-                        Verified Expert Knowledge Contributor
+                        {tLocal.authorBoxSub}
                       </span>
                     </div>
 
@@ -854,8 +1163,8 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                           {isFollowLoading
                             ? "..."
                             : isFollowing
-                              ? "Following"
-                              : "Follow Author"}
+                              ? tLocal.btnFollowing
+                              : tLocal.btnFollow}
                         </button>
                         {isFollowing && (
                           <label className="flex items-center gap-2 cursor-pointer text-[10px] uppercase font-bold text-slate-500">
@@ -867,7 +1176,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                               }
                               className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                             />
-                            Notify on new posts
+                            {tLocal.btnNotify}
                           </label>
                         )}
                       </div>
@@ -880,7 +1189,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                   {/* Evidence & References */}
                   <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm">
                     <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">
-                      Evidence & Sources
+                      {tLocal.titleSources}
                     </h3>
                     <div className="space-y-4">
                       {ko.evidence && (
@@ -893,7 +1202,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                       {ko.references && ko.references.length > 0 && (
                         <div>
                           <h4 className="text-[10px] font-bold uppercase text-slate-400 mb-2">
-                            Sources & References (One Box)
+                            {tLocal.titleSources}
                           </h4>
                           <div className="space-y-3">
                             {ko.references.map((ref, i) => (

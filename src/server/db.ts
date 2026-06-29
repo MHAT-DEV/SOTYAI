@@ -1964,7 +1964,8 @@ export function createDebate(data: { knowledge_a_id: string; knowledge_b_id: str
     authorId: 'system',
     authorName: 'Debate Engine',
     identityType: 'System' as any,
-    changes: `Created debate comparison against ${data.knowledge_b_id}`
+    commitMessage: 'Debate comparison initialized',
+    changes: { modified: [`Created debate comparison against ${data.knowledge_b_id}`] }
   };
   knowledgeHistoryStore.unshift(historyEventA);
 
@@ -1977,7 +1978,8 @@ export function createDebate(data: { knowledge_a_id: string; knowledge_b_id: str
     authorId: 'system',
     authorName: 'Debate Engine',
     identityType: 'System' as any,
-    changes: `Created debate comparison against ${data.knowledge_a_id}`
+    commitMessage: 'Debate comparison initialized',
+    changes: { modified: [`Created debate comparison against ${data.knowledge_a_id}`] }
   };
   knowledgeHistoryStore.unshift(historyEventB);
 
@@ -2002,15 +2004,15 @@ export function computeDebateScore(debateId: string, result: DebateResult, summa
     });
 
     if (koA && aWins > bWins) {
-       koA.trustScore.score = Math.min(100, koA.trustScore.score + 2);
+       koA.trustScore.overall = Math.min(100, koA.trustScore.overall + 2);
     } else if (koA && bWins > aWins) {
-       koA.trustScore.score = Math.max(0, koA.trustScore.score - 2);
+       koA.trustScore.overall = Math.max(0, koA.trustScore.overall - 2);
     }
     
     if (koB && bWins > aWins) {
-       koB.trustScore.score = Math.min(100, koB.trustScore.score + 2);
+       koB.trustScore.overall = Math.min(100, koB.trustScore.overall + 2);
     } else if (koB && aWins > bWins) {
-       koB.trustScore.score = Math.max(0, koB.trustScore.score - 2);
+       koB.trustScore.overall = Math.max(0, koB.trustScore.overall - 2);
     }
 
     knowledgeHistoryStore.unshift({
@@ -2022,7 +2024,8 @@ export function computeDebateScore(debateId: string, result: DebateResult, summa
         authorId: 'system',
         authorName: 'Debate Engine',
         identityType: 'System' as any,
-        changes: `Debate result computed.`
+        commitMessage: 'Debate score computed',
+        changes: { modified: [`Debate result computed.`] }
     });
     knowledgeHistoryStore.unshift({
         id: `hist_${Date.now()}_D`,
@@ -2033,7 +2036,8 @@ export function computeDebateScore(debateId: string, result: DebateResult, summa
         authorId: 'system',
         authorName: 'Debate Engine',
         identityType: 'System' as any,
-        changes: `Debate result computed.`
+        commitMessage: 'Debate score computed',
+        changes: { modified: [`Debate result computed.`] }
     });
     return debate;
   }

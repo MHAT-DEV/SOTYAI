@@ -108,6 +108,8 @@ export interface KnowledgeObject {
   id: string;
   title: string;
   knowledgeType?: KnowledgeType;
+  code?: string;
+  sandboxEnv?: string;
   
   // AI Native Structure
   problem: string;

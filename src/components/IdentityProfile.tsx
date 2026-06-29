@@ -3,12 +3,499 @@ import { useParams, Link } from 'react-router-dom';
 import { Identity, ActivityEvent } from '../types';
 import { Shield, User, Box, Bot, Activity, Award, Star, BookOpen, CheckCircle, Target, Users, Key, History, Link as LinkIcon, Briefcase, Lock, Unlock, MessageSquare, Send, Heart, Plus, Trash2, Globe, Settings, UserCheck } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
+import { useLanguage } from '../context/LanguageContext';
 
 interface IdentityProfileProps {
   identity: Identity | null;
 }
 
+const localTranslations: Record<string, Record<string, string>> = {
+  th: {
+    loading: 'กำลังโหลดโปรไฟล์...',
+    notFound: 'ไม่พบข้อมูลประจำตัว',
+    following: 'กำลังติดตาม',
+    follow: 'ติดตาม',
+    sendMessage: 'ส่งข้อความ',
+    type: 'ประเภท',
+    visibility: 'ทัศนวิสัย',
+    humanFollowers: 'ผู้ติดตามที่เป็นมนุษย์',
+    aiFollowers: 'ผู้ติดตามที่เป็น AI',
+    organizations: 'องค์กร',
+    enterprise: 'ระบบวิสาหกิจ',
+    trustProfile: 'โปรไฟล์ความน่าเชื่อถือ',
+    verifications: 'การยืนยันตัวตน',
+    badges: 'ตราสัญลักษณ์',
+    reputation: 'มิติชื่อเสียง',
+    expertise: 'กราฟความเชี่ยวชาญ',
+    recentActivity: 'กิจกรรมล่าสุด',
+    publicGroup: 'กลุ่มสาธารณะ',
+    privateGroup: 'กลุ่มส่วนตัว',
+    isMember: 'เป็นสมาชิกแล้ว',
+    leaveSpace: 'ออกจากกลุ่ม',
+    joinSpace: 'เข้าร่วมกลุ่ม (Join Space)',
+    members: 'สมาชิก',
+    posts: 'โพสต์ในกลุ่ม',
+    trustScore: 'คะแนนความน่าเชื่อถือสเปซ',
+    publicDesc: 'สเปซสาธารณะ (ทุกคนเข้าถึงได้)',
+    privateDesc: 'สเปซส่วนตัว (เฉพาะสมาชิก)',
+    privateWarningTitle: 'กลุ่มสเปซนี้เป็นแบบส่วนตัว (Private Space)',
+    privateWarningDesc: 'เนื้อหา โพสต์ สมาชิก และห้องแชทของกลุ่มนี้ถูกจำกัดไว้เฉพาะสมาชิกที่ได้รับอนุญาตเท่านั้น กรุณากดเข้าร่วมกลุ่มเพื่อเข้าถึงเนื้อหาภายในกลุ่ม',
+    joinGroupNow: 'เข้าร่วมกลุ่มเลย',
+    menu: 'เมนูของกลุ่ม',
+    postsTab: 'โพสต์และฟีด (Posts)',
+    chatTab: 'แชทกลุ่ม (Group Chat)',
+    membersTab: 'รายชื่อสมาชิก',
+    settingsTab: 'การตั้งค่ากลุ่ม (Settings)',
+    rules: 'กฎระเบียบของกลุ่ม',
+    rulesDesc: '1. แลกเปลี่ยนความรู้ด้วยความสุภาพและอิงข้อเท็จจริงทางวิชาการ 2. สนับสนุนการแชร์ Node ความรู้ที่มีการตรวจสอบ (Verified Node) เพื่อลด AI Slop 3. ไม่แชร์ความลับองค์กรหรือ API Key สาธารณะเด็ดขาด',
+    postPlaceholder: 'เขียนอะไรบางอย่างเพื่อแบ่งปันข้อมูลให้กับคนในกลุ่มสเปซนี้...',
+    postButton: 'โพสต์เลย',
+    commentPlaceholder: 'แสดงความคิดเห็นต่อโพสต์นี้...',
+    send: 'ส่ง',
+    chatPlaceholder: 'พิมพ์ข้อความคุยกับทีม...',
+    addMemberTitle: 'เพิ่มสมาชิกใหม่เข้ากลุ่มสเปซ (Add Members)',
+    addMemberDesc: 'ในฐานะ Admin คุณสามารถค้นหารายชื่อผู้ใช้และบอท เพื่อเพิ่มความร่วมมือเข้าสู่กลุ่มได้ทันที',
+    addMemberBtn: 'เพิ่มเข้าสเปซ',
+    roles: 'บทบาท:'
+  },
+  en: {
+    loading: 'Loading Trust Profile...',
+    notFound: 'Identity not found',
+    following: 'Following',
+    follow: 'Follow',
+    sendMessage: 'Send Message',
+    type: 'Type',
+    visibility: 'Visibility',
+    humanFollowers: 'Human Followers',
+    aiFollowers: 'AI Followers',
+    organizations: 'Organizations',
+    enterprise: 'Enterprise Systems',
+    trustProfile: 'Trust Profile',
+    verifications: 'Verifications',
+    badges: 'Badges',
+    reputation: 'Reputation Dimensions',
+    expertise: 'Expertise Graph',
+    recentActivity: 'Recent Activity',
+    publicGroup: 'Public Group',
+    privateGroup: 'Private Group',
+    isMember: 'Is Member',
+    leaveSpace: 'Leave Space',
+    joinSpace: 'Join Space',
+    members: 'Members',
+    posts: 'Space Posts',
+    trustScore: 'Space Trust Score',
+    publicDesc: 'Public Space (accessible to everyone)',
+    privateDesc: 'Private Space (members only)',
+    privateWarningTitle: 'This is a Private Space',
+    privateWarningDesc: 'Contents, posts, member lists, and chat rooms are restricted to authorized members only. Please join the space to access its contents.',
+    joinGroupNow: 'Join Space Now',
+    menu: 'Group Menu',
+    postsTab: 'Posts & Feed',
+    chatTab: 'Group Chat',
+    membersTab: 'Members List',
+    settingsTab: 'Group Settings',
+    rules: 'Group Rules',
+    rulesDesc: '1. Exchange knowledge politely and academically. 2. Support sharing Verified Nodes to reduce AI Slop. 3. Strictly do not share organization secrets or public API Keys.',
+    postPlaceholder: 'Write something to share with the group in this space...',
+    postButton: 'Post Now',
+    commentPlaceholder: 'Leave a comment on this post...',
+    send: 'Send',
+    chatPlaceholder: 'Type a message to the team...',
+    addMemberTitle: 'Add New Members to Space',
+    addMemberDesc: 'As an Admin, you can search for users and bots to invite and add to the space immediately.',
+    addMemberBtn: 'Add to Space',
+    roles: 'Roles:'
+  },
+  ja: {
+    loading: '信頼プロファイルを読み込み中...',
+    notFound: 'アイデンティティが見つかりません',
+    following: 'フォロー中',
+    follow: 'フォローする',
+    sendMessage: 'メッセージを送信',
+    type: 'タイプ',
+    visibility: '公開範囲',
+    humanFollowers: '人間のフォロワー',
+    aiFollowers: 'AIフォロワー',
+    organizations: '組織',
+    enterprise: 'エンタープライズシステム',
+    trustProfile: '信頼プロファイル',
+    verifications: '検証',
+    badges: 'バッジ',
+    reputation: 'レピュテーションディメンション',
+    expertise: '専門分野グラフ',
+    recentActivity: '最近のアクティビティ',
+    publicGroup: 'パブリックグループ',
+    privateGroup: 'プライベートグループ',
+    isMember: 'メンバー登録済み',
+    leaveSpace: 'スペースを退会',
+    joinSpace: 'スペースに参加 (Join Space)',
+    members: 'メンバー',
+    posts: 'スペース内の投稿',
+    trustScore: 'スペース信頼度スコア',
+    publicDesc: 'パブリックスペース（誰でもアクセス可能）',
+    privateDesc: 'プライベートスペース（メンバーのみ）',
+    privateWarningTitle: 'このスペースは非公開です（Private Space）',
+    privateWarningDesc: 'このグループのコンテンツ、投稿、メンバーリスト、チャットルームは、承認されたメンバーのみに制限されています。内部コンテンツにアクセスするには、グループに参加してください。',
+    joinGroupNow: '今すぐグループに参加する',
+    menu: 'グループメニュー',
+    postsTab: '投稿とフィード (Posts)',
+    chatTab: 'グループチャット (Group Chat)',
+    membersTab: 'メンバーリスト',
+    settingsTab: 'グループ設定 (Settings)',
+    rules: 'グループの規則',
+    rulesDesc: '1. 礼儀正しく、学術的事実に基づいて知識を交換します。2. AI Slopを減らすために、検証済みのナレッジノードの共有を支援します。3. 組織の秘密や公開APIキーは絶対に共有しないでください。',
+    postPlaceholder: 'このスペースのメンバーに何か情報を共有しましょう...',
+    postButton: '今すぐ投稿',
+    commentPlaceholder: 'この投稿にコメントを書く...',
+    send: '送信',
+    chatPlaceholder: 'チームとチャットするメッセージを入力...',
+    addMemberTitle: 'スペースに新しいメンバーを追加 (Add Members)',
+    addMemberDesc: '管理者として、ユーザーやボットを検索し、すぐにスペースに招待してコラボレーションを追加できます。',
+    addMemberBtn: 'スペースに追加',
+    roles: '役割:'
+  },
+  zh: {
+    loading: '正在加载信任特征...',
+    notFound: '未找到身份信息',
+    following: '正在关注',
+    follow: '关注',
+    sendMessage: '发送消息',
+    type: '类型',
+    visibility: '可见性',
+    humanFollowers: '人类关注者',
+    aiFollowers: 'AI关注者',
+    organizations: '组织成员',
+    enterprise: '企业系统',
+    trustProfile: '信任特征',
+    verifications: '认证资质',
+    badges: '荣誉徽章',
+    reputation: '声誉度量',
+    expertise: '专业技能图谱',
+    recentActivity: '最近动态',
+    publicGroup: '公开群组',
+    privateGroup: '私有群组',
+    isMember: '已加入成员',
+    leaveSpace: '退出空间',
+    joinSpace: '加入空间 (Join Space)',
+    members: '群组成员',
+    posts: '空间帖子',
+    trustScore: '空间信任评分',
+    publicDesc: '公开空间（所有人可访问）',
+    privateDesc: '私有空间（仅限成员）',
+    privateWarningTitle: '此空间群组为私有空间 (Private Space)',
+    privateWarningDesc: '此群组的内容、帖子、成员列表和聊天室仅对授权成员开放。请先申请加入空间以访问内部内容。',
+    joinGroupNow: '立即加入群组',
+    menu: '群组菜单',
+    postsTab: '帖子与动态 (Posts)',
+    chatTab: '群组聊天 (Group Chat)',
+    membersTab: '成员名单',
+    settingsTab: '空间设置 (Settings)',
+    rules: '群组规范',
+    rulesDesc: '1. 以礼貌和学术事实为基础交流知识。2. 鼓励分享经过验证的知识节点以减少 AI 废话。3. 严禁分享组织机密或公共 API 密钥。',
+    postPlaceholder: '写点什么与空间群组中的成员分享吧...',
+    postButton: '立即发布',
+    commentPlaceholder: '发表评论...',
+    send: '发送',
+    chatPlaceholder: '输入消息与团队互动...',
+    addMemberTitle: '向空间添加新成员 (Add Members)',
+    addMemberDesc: '作为管理员，您可以直接搜索用户或机器人并拉入空间以展开协作。',
+    addMemberBtn: '添加到空间',
+    roles: '角色权限:'
+  },
+  ko: {
+    loading: '신뢰 프로필 로딩 중...',
+    notFound: '프로필을 찾을 수 없습니다',
+    following: '팔로잉',
+    follow: '팔로우',
+    sendMessage: '메시지 전송',
+    type: '유형',
+    visibility: '공개 상태',
+    humanFollowers: '일반 팔로워',
+    aiFollowers: 'AI 팔로워',
+    organizations: '소속 기관',
+    enterprise: '엔터프라이즈 시스템',
+    trustProfile: '신뢰 프로필',
+    verifications: '인증 내역',
+    badges: '보유 배지',
+    reputation: '평판 지표',
+    expertise: '전문 분야 분석',
+    recentActivity: '최근 활동',
+    publicGroup: '공개 그룹',
+    privateGroup: '비공개 그룹',
+    isMember: '가입된 멤버',
+    leaveSpace: '그룹 탈퇴',
+    joinSpace: '그룹 가입 (Join Space)',
+    members: '멤버 수',
+    posts: '작성된 포스트',
+    trustScore: '그룹 신뢰 지수',
+    publicDesc: '공개 스페이스 (모두 접근 가능)',
+    privateDesc: '비공개 스페이스 (멤버 전용)',
+    privateWarningTitle: '이 그룹 스페이스는 비공개(Private Space)입니다',
+    privateWarningDesc: '이 그룹의 컨텐츠, 게시글, 멤버 및 채팅방은 허가된 멤버만 접근할 수 있습니다. 스페이스에 가입하여 내부 컨텐츠에 액세스하세요.',
+    joinGroupNow: '그룹 지금 가입하기',
+    menu: '그룹 메뉴',
+    postsTab: '포스트 및 피드 (Posts)',
+    chatTab: '그룹 채팅 (Group Chat)',
+    membersTab: '멤버 리스트',
+    settingsTab: '그룹 설정 (Settings)',
+    rules: '그룹 규칙',
+    rulesDesc: '1. 정중하고 학술적 사실에 의거하여 지식을 공유합니다. 2. AI Slop을 방지하기 위해 검증된 노드 공유를 지향합니다. 3. 기업 기밀 혹은 API Key를 공유하는 행위는 엄격히 금지됩니다.',
+    postPlaceholder: '그룹원들과 공유할 내용을 자유롭게 작성하세요...',
+    postButton: '게시하기',
+    commentPlaceholder: '댓글 남기기...',
+    send: '전송',
+    chatPlaceholder: '멤버들과 소통할 메시지 입력...',
+    addMemberTitle: '그룹에 새로운 멤버 초대하기 (Add Members)',
+    addMemberDesc: 'Admin 권한으로 새로운 사용자나 봇을 검색하고 그룹에 바로 추가하여 협업할 수 있습니다.',
+    addMemberBtn: '그룹에 추가',
+    roles: '역할:'
+  },
+  de: {
+    loading: 'Vertrauensprofil wird geladen...',
+    notFound: 'Identität nicht gefunden',
+    following: 'Folge ich',
+    follow: 'Folgen',
+    sendMessage: 'Nachricht senden',
+    type: 'Typ',
+    visibility: 'Sichtbarkeit',
+    humanFollowers: 'Menschliche Follower',
+    aiFollowers: 'KI-Follower',
+    organizations: 'Organisationen',
+    enterprise: 'Unternehmenssysteme',
+    trustProfile: 'Vertrauensprofil',
+    verifications: 'Verifizierungen',
+    badges: 'Abzeichen',
+    reputation: 'Reputationsdimensionen',
+    expertise: 'Expertisegraf',
+    recentActivity: 'Letzte Aktivität',
+    publicGroup: 'Öffentliche Gruppe',
+    privateGroup: 'Private Gruppe',
+    isMember: 'Ist Mitglied',
+    leaveSpace: 'Gruppe verlassen',
+    joinSpace: 'Gruppe beitreten (Join Space)',
+    members: 'Mitglieder',
+    posts: 'Gruppenbeiträge',
+    trustScore: 'Gruppen-Vertrauenswert',
+    publicDesc: 'Öffentlicher Bereich (für alle zugänglich)',
+    privateDesc: 'Privater Bereich (nur für Mitglieder)',
+    privateWarningTitle: 'Diese Gruppe ist privat (Private Space)',
+    privateWarningDesc: 'Inhalte, Beiträge, Mitgliederlisten und Chaträume dieser Gruppe sind auf autorisierte Mitglieder beschränkt. Bitte treten Sie der Gruppe bei, um auf interne Inhalte zuzugreifen.',
+    joinGroupNow: 'Gruppe beitreten',
+    menu: 'Gruppenmenü',
+    postsTab: 'Beiträge & Feed (Posts)',
+    chatTab: 'Gruppenchat (Group Chat)',
+    membersTab: 'Mitgliederliste',
+    settingsTab: 'Gruppeneinstellungen (Settings)',
+    rules: 'Gruppenregeln',
+    rulesDesc: '1. Tauschen Sie Wissen höflich und wissenschaftlich fundiert aus. 2. Unterstützen Sie das Teilen verifizierter Wissensknoten, um AI-Slop zu reduzieren. 3. Teilen Sie niemals Unternehmensgeheimnisse oder öffentliche API-Schlüssel.',
+    postPlaceholder: 'Schreiben Sie etwas, um es mit den Mitgliedern dieser Gruppe zu teilen...',
+    postButton: 'Jetzt posten',
+    commentPlaceholder: 'Hinterlassen Sie einen Kommentar...',
+    send: 'Senden',
+    chatPlaceholder: 'Schreiben Sie eine Nachricht an das Team...',
+    addMemberTitle: 'Neues Mitglied zur Gruppe hinzufügen (Add Members)',
+    addMemberDesc: 'Als Administrator können Sie nach Benutzern und Bots suchen, um sie sofort der Gruppe hinzuzufügen.',
+    addMemberBtn: 'Hinzufügen',
+    roles: 'Rollen:'
+  },
+  fr: {
+    loading: 'Chargement du profil de confiance...',
+    notFound: 'Identité introuvable',
+    following: 'Abonné',
+    follow: 'S\'abonner',
+    sendMessage: 'Envoyer un Message',
+    type: 'Type',
+    visibility: 'Visibilité',
+    humanFollowers: 'Abonnés Humains',
+    aiFollowers: 'Abonnés IA',
+    organizations: 'Organisations',
+    enterprise: 'Systèmes d\'Entreprise',
+    trustProfile: 'Profil de Confiance',
+    verifications: 'Vérifications',
+    badges: 'Badges',
+    reputation: 'Dimensions de Réputation',
+    expertise: 'Graphe d\'Expertise',
+    recentActivity: 'Activité Récente',
+    publicGroup: 'Groupe Public',
+    privateGroup: 'Groupe Privé',
+    isMember: 'Est Membre',
+    leaveSpace: 'Quitter l\'Espace',
+    joinSpace: 'Rejoindre l\'Espace',
+    members: 'Membres',
+    posts: 'Publications',
+    trustScore: 'Score de Confiance de l\'Espace',
+    publicDesc: 'Espace Public (accessible à tous)',
+    privateDesc: 'Espace Privé (membres uniquement)',
+    privateWarningTitle: 'Cet espace est privé (Private Space)',
+    privateWarningDesc: 'Le contenu, les publications, la liste des membres et les salons de discussion de ce groupe sont réservés aux membres autorisés. Veuillez rejoindre le groupe pour accéder au contenu interne.',
+    joinGroupNow: 'Rejoindre le groupe maintenant',
+    menu: 'Menu du Groupe',
+    postsTab: 'Publications & Flux (Posts)',
+    chatTab: 'Chat du Groupe (Group Chat)',
+    membersTab: 'Liste des Membres',
+    settingsTab: 'Paramètres du Groupe (Settings)',
+    rules: 'Règles du Groupe',
+    rulesDesc: '1. Échangez vos connaissances poliment et sur des bases académiques. 2. Encouragez le partage de nœuds de connaissances vérifiés pour limiter l\'AI Slop. 3. Ne partagez jamais de secrets d\'entreprise ni de clés d\'API publiques.',
+    postPlaceholder: 'Écrivez quelque chose à partager avec les membres du groupe...',
+    postButton: 'Publier',
+    commentPlaceholder: 'Laisser un commentaire...',
+    send: 'Envoyer',
+    chatPlaceholder: 'Tapez un message pour l\'équipe...',
+    addMemberTitle: 'Ajouter de nouveaux membres (Add Members)',
+    addMemberDesc: 'En tant qu\'Admin, vous pouvez rechercher des utilisateurs et des bots à ajouter à l\'espace immédiatement.',
+    addMemberBtn: 'Ajouter',
+    roles: 'Rôles :'
+  },
+  es: {
+    loading: 'Cargando perfil de confianza...',
+    notFound: 'Identidad no encontrada',
+    following: 'Siguiendo',
+    follow: 'Seguir',
+    sendMessage: 'Enviar Mensaje',
+    type: 'Tipo',
+    visibility: 'Visibilidad',
+    humanFollowers: 'Seguidores Humanos',
+    aiFollowers: 'Seguidores de IA',
+    organizations: 'Organizaciones',
+    enterprise: 'Sistemas Empresariales',
+    trustProfile: 'Perfil de Confianza',
+    verifications: 'Verificaciones',
+    badges: 'Insignias',
+    reputation: 'Dimensiones de Reputación',
+    expertise: 'Gráfico de Experiencia',
+    recentActivity: 'Actividad Reciente',
+    publicGroup: 'Grupo Público',
+    privateGroup: 'Grupo Privado',
+    isMember: 'Es Miembro',
+    leaveSpace: 'Salir del Grupo',
+    joinSpace: 'Unirse al Grupo (Join Space)',
+    members: 'Miembros',
+    posts: 'Publicaciones del Grupo',
+    trustScore: 'Puntaje de Confianza',
+    publicDesc: 'Espacio Público (accesible para todos)',
+    privateDesc: 'Espacio Privado (solo miembros)',
+    privateWarningTitle: 'Este grupo es privado (Private Space)',
+    privateWarningDesc: 'El contenido, publicaciones, lista de miembros y salas de chat de este grupo están limitados únicamente a miembros autorizados. Únase al grupo para acceder.',
+    joinGroupNow: 'Unirse al grupo ahora',
+    menu: 'Menú del Grupo',
+    postsTab: 'Publicaciones y Feed (Posts)',
+    chatTab: 'Chat del Grupo (Group Chat)',
+    membersTab: 'Lista de Miembros',
+    settingsTab: 'Configuración del Grupo (Settings)',
+    rules: 'Reglas del Grupo',
+    rulesDesc: '1. Intercambie conocimientos con cortesía y basado en hechos académicos. 2. Promueva el intercambio de Nodos Verificados para reducir el AI Slop. 3. No comparta secretos de la empresa ni claves API públicas.',
+    postPlaceholder: 'Escriba algo para compartir con los miembros de este espacio...',
+    postButton: 'Publicar ahora',
+    commentPlaceholder: 'Deja un comentario...',
+    send: 'Enviar',
+    chatPlaceholder: 'Escribe un mensaje para el equipo...',
+    addMemberTitle: 'Agregar nuevo miembro al espacio (Add Members)',
+    addMemberDesc: 'Como Administrador, puede buscar usuarios y bots para agregarlos al espacio inmediatamente.',
+    addMemberBtn: 'Agregar',
+    roles: 'Roles:'
+  },
+  ru: {
+    loading: 'Загрузка доверенного профиля...',
+    notFound: 'Профиль не найден',
+    following: 'Вы подписаны',
+    follow: 'Подписаться',
+    sendMessage: 'Написать',
+    type: 'Тип',
+    visibility: 'Видимость',
+    humanFollowers: 'Подписчики (Люди)',
+    aiFollowers: 'Подписчики (ИИ)',
+    organizations: 'Организации',
+    enterprise: 'Корпоративные системы',
+    trustProfile: 'Доверенный профиль',
+    verifications: 'Верификации',
+    badges: 'Значки',
+    reputation: 'Параметры репутации',
+    expertise: 'График компетенций',
+    recentActivity: 'Последняя активность',
+    publicGroup: 'Открытая группа',
+    privateGroup: 'Закрытая группа',
+    isMember: 'Участник',
+    leaveSpace: 'Выйти из группы',
+    joinSpace: 'Вступить в группу (Join Space)',
+    members: 'Участники',
+    posts: 'Посты в группе',
+    trustScore: 'Индекс доверия группы',
+    publicDesc: 'Публичная группа (доступна всем)',
+    privateDesc: 'Закрытая группа (только участникам)',
+    privateWarningTitle: 'Эта группа является закрытой (Private Space)',
+    privateWarningDesc: 'Контент, публикации, список участников и чаты этой группы доступны только верифицированным членам. Пожалуйста, отправьте запрос на вступление, чтобы получить доступ.',
+    joinGroupNow: 'Вступить в группу',
+    menu: 'Меню группы',
+    postsTab: 'Публикации и фид (Posts)',
+    chatTab: 'Чат группы (Group Chat)',
+    membersTab: 'Список участников',
+    settingsTab: 'Настройки группы (Settings)',
+    rules: 'Правила сообщества',
+    rulesDesc: '1. Общайтесь уважительно и приводите научные факты. 2. Поддерживайте верифицированные узлы знаний для борьбы с ИИ-мусором (AI Slop). 3. Категорически запрещено делиться коммерческой тайной или API ключами.',
+    postPlaceholder: 'Напишите что-нибудь, чтобы поделиться с участниками сообщества...',
+    postButton: 'Опубликовать',
+    commentPlaceholder: 'Написать комментарий...',
+    send: 'Отправить',
+    chatPlaceholder: 'Введите сообщение...',
+    addMemberTitle: 'Добавить участников в группу (Add Members)',
+    addMemberDesc: 'В качестве администратора вы можете осуществлять поиск пользователей и ботов для немедленного приглашения в пространство.',
+    addMemberBtn: 'Добавить',
+    roles: 'Роль:'
+  },
+  vi: {
+    loading: 'Đang tải hồ sơ độ tin cậy...',
+    notFound: 'Không tìm thấy danh tính',
+    following: 'Đang theo dõi',
+    follow: 'Theo dõi',
+    sendMessage: 'Gửi tin nhắn',
+    type: 'Loại',
+    visibility: 'Trạng thái',
+    humanFollowers: 'Người theo dõi (Người)',
+    aiFollowers: 'Người theo dõi (AI)',
+    organizations: 'Tổ chức',
+    enterprise: 'Hệ thống doanh nghiệp',
+    trustProfile: 'Hồ sơ tin cậy',
+    verifications: 'Xác minh',
+    badges: 'Huy hiệu',
+    reputation: 'Chỉ số uy tín',
+    expertise: 'Biểu đồ chuyên môn',
+    recentActivity: 'Hoạt động gần đây',
+    publicGroup: 'Nhóm công khai',
+    privateGroup: 'Nhóm riêng tư',
+    isMember: 'Đã là thành viên',
+    leaveSpace: 'Rời khỏi nhóm',
+    joinSpace: 'Tham gia nhóm (Join Space)',
+    members: 'Thành viên',
+    posts: 'Bài viết trong nhóm',
+    trustScore: 'Điểm tin cậy không gian',
+    publicDesc: 'Không gian công cộng (mọi người đều có thể truy cập)',
+    privateDesc: 'Không gian riêng tư (chỉ dành cho thành viên)',
+    privateWarningTitle: 'Không gian này là riêng tư (Private Space)',
+    privateWarningDesc: 'Nội dung, bài viết, danh sách thành viên và phòng trò chuyện của nhóm này bị giới hạn cho thành viên được ủy quyền. Vui lòng tham gia nhóm để truy cập.',
+    joinGroupNow: 'Tham gia nhóm ngay',
+    menu: 'Trình đơn nhóm',
+    postsTab: 'Bài viết & Nguồn cấp (Posts)',
+    chatTab: 'Trò chuyện nhóm (Group Chat)',
+    membersTab: 'Danh sách thành viên',
+    settingsTab: 'Cài đặt nhóm (Settings)',
+    rules: 'Quy định nhóm',
+    rulesDesc: '1. Trao đổi kiến thức lịch sự và dựa trên dữ liệu học thuật. 2. Khuyến khích chia sẻ Nút kiến thức đã xác minh để giảm AI Slop. 3. Tuyệt đối không chia sẻ bí mật doanh nghiệp hoặc API Key.',
+    postPlaceholder: 'Viết nội dung chia sẻ với mọi người trong không gian này...',
+    postButton: 'Đăng ngay',
+    commentPlaceholder: 'Để lại bình luận...',
+    send: 'Gửi',
+    chatPlaceholder: 'Nhập tin nhắn trò chuyện với nhóm...',
+    addMemberTitle: 'Thêm thành viên mới vào không gian (Add Members)',
+    addMemberDesc: 'Với vai trò Admin, bạn có thể tìm kiếm người dùng và bot để thêm vào không gian làm việc ngay lập tức.',
+    addMemberBtn: 'Thêm vào không gian',
+    roles: 'Vai trò:'
+  }
+};
+
 export default function IdentityProfile({ identity }: IdentityProfileProps) {
+  const { language } = useLanguage();
+  const lt = localTranslations[language] || localTranslations['en'];
+
   const { id } = useParams<{ id: string }>();
   const [profile, setProfile] = useState<Identity | null>(null);
   const [activities, setActivities] = useState<ActivityEvent[]>([]);
@@ -350,8 +837,8 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
     }
   };
 
-  if (loading) return <div className="py-12 text-center text-slate-500">Loading Trust Profile...</div>;
-  if (!profile) return <div className="py-12 text-center text-red-500">Identity not found</div>;
+  if (loading) return <div className="py-12 text-center text-slate-500">{lt.loading}</div>;
+  if (!profile) return <div className="py-12 text-center text-red-500">{lt.notFound}</div>;
 
   if (profile.type === 'Organization') {
     return (
@@ -361,9 +848,9 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
           <div className="h-48 bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-900 relative p-6 flex flex-col justify-end">
             <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-white text-xs font-semibold">
               {profile.visibility === 'Public' ? (
-                <><Globe className="w-4 h-4 text-emerald-400" /> Public Group</>
+                <><Globe className="w-4 h-4 text-emerald-400" /> {lt.publicGroup}</>
               ) : (
-                <><Lock className="w-4 h-4 text-amber-400" /> Private Group</>
+                <><Lock className="w-4 h-4 text-amber-400" /> {lt.privateGroup}</>
               )}
             </div>
             
@@ -385,14 +872,14 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                 {isMember ? (
                   <div className="flex items-center gap-2">
                     <span className="bg-emerald-500/20 text-emerald-300 px-3 py-1.5 rounded-lg text-xs font-bold border border-emerald-500/30 flex items-center gap-1">
-                      <UserCheck className="w-3.5 h-3.5" /> เป็นสมาชิกแล้ว ({mySpaceRole})
+                      <UserCheck className="w-3.5 h-3.5" /> {lt.isMember} ({mySpaceRole})
                     </span>
                     <button
                       onClick={handleLeaveSpace}
                       disabled={isSpaceActionLoading}
                       className="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border border-white/10 cursor-pointer"
                     >
-                      ออกจากกลุ่ม
+                      {lt.leaveSpace}
                     </button>
                   </div>
                 ) : (
@@ -401,7 +888,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                     disabled={isSpaceActionLoading}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 cursor-pointer"
                   >
-                    <Plus className="w-4 h-4" /> เข้าร่วมกลุ่ม (Join Space)
+                    <Plus className="w-4 h-4" /> {lt.joinSpace}
                   </button>
                 )}
               </div>
@@ -413,20 +900,20 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
             <div className="flex flex-wrap items-center gap-6 text-slate-600">
               <span className="flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-slate-400" />
-                <strong>{spaceMembers.length}</strong> สมาชิก
+                <strong>{spaceMembers.length}</strong> {lt.members}
               </span>
               <span className="flex items-center gap-1.5">
                 <BookOpen className="w-4 h-4 text-slate-400" />
-                <strong>{spacePosts.length}</strong> โพสต์ในกลุ่ม
+                <strong>{spacePosts.length}</strong> {lt.posts}
               </span>
               <span className="flex items-center gap-1.5">
                 <Shield className="w-4 h-4 text-slate-400" />
-                คะแนนความน่าเชื่อถือสเปซ: <strong className="text-emerald-600 font-bold">{profile.trustProfile?.identity || 99}%</strong>
+                {lt.trustScore}: <strong className="text-emerald-600 font-bold">{profile.trustProfile?.identity || 99}%</strong>
               </span>
             </div>
             
             <div className="text-xs font-semibold text-slate-500 bg-slate-200/60 px-3 py-1 rounded-md">
-              สเปซ{profile.visibility === 'Public' ? 'สาธารณะ (ทุกคนเข้าถึงได้)' : 'ส่วนตัว (เฉพาะสมาชิก)'}
+              {profile.visibility === 'Public' ? lt.publicDesc : lt.privateDesc}
             </div>
           </div>
         </div>
@@ -435,16 +922,16 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
         {profile.visibility === 'Private' && !isMember ? (
           <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-2xl mx-auto shadow-md">
             <Lock className="w-16 h-16 text-indigo-600 mx-auto mb-4 p-3 bg-indigo-50 rounded-2xl border border-indigo-100" />
-            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">กลุ่มสเปซนี้เป็นแบบส่วนตัว (Private Space)</h2>
+            <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">{lt.privateWarningTitle}</h2>
             <p className="text-slate-500 text-sm mt-2 max-w-md mx-auto leading-relaxed">
-              เนื้อหา โพสต์ สมาชิก และห้องแชทของกลุ่มนี้ถูกจำกัดไว้เฉพาะสมาชิกที่ได้รับอนุญาตเท่านั้น กรุณากดเข้าร่วมกลุ่มเพื่อเข้าถึงเนื้อหาภายในกลุ่ม
+              {lt.privateWarningDesc}
             </p>
             <button
               onClick={handleJoinSpace}
               disabled={isSpaceActionLoading}
               className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg hover:bg-indigo-700 transition-all flex items-center gap-2 mx-auto cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> เข้าร่วมกลุ่มเลย
+              <Plus className="w-4 h-4" /> {lt.joinGroupNow}
             </button>
           </div>
         ) : (
@@ -452,7 +939,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
             {/* Sidebar with Tabs */}
             <div className="lg:col-span-1 space-y-4">
               <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-1">
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 mb-3">เมนูของกลุ่ม</h3>
+                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 mb-3">{lt.menu}</h3>
                 
                 <button
                   onClick={() => setActiveSpaceTab('feed')}
@@ -462,7 +949,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
                 >
-                  <BookOpen className="w-4 h-4" /> โพสต์และฟีด (Posts)
+                  <BookOpen className="w-4 h-4" /> {lt.postsTab}
                 </button>
                 
                 <button
@@ -473,7 +960,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
                 >
-                  <MessageSquare className="w-4 h-4" /> แชทกลุ่ม (Group Chat)
+                  <MessageSquare className="w-4 h-4" /> {lt.chatTab}
                   <span className="ml-auto bg-indigo-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full">
                     LIVE
                   </span>
@@ -487,9 +974,9 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }`}
                 >
-                  <Users className="w-4 h-4" /> รายชื่อสมาชิก ({spaceMembers.length})
+                  <Users className="w-4 h-4" /> {lt.membersTab} ({spaceMembers.length})
                 </button>
-
+ 
                 {isAdmin && (
                   <button
                     onClick={() => setActiveSpaceTab('settings')}
@@ -499,24 +986,22 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                     }`}
                   >
-                    <Settings className="w-4 h-4" /> การตั้งค่ากลุ่ม (Settings)
+                    <Settings className="w-4 h-4" /> {lt.settingsTab}
                   </button>
                 )}
               </div>
-
+ 
               {/* Group Rules & Info widget */}
               <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1">
-                  <Shield className="w-4 h-4 text-indigo-600" /> กฎระเบียบของกลุ่ม
+                  <Shield className="w-4 h-4 text-indigo-600" /> {lt.rules}
                 </h4>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  1. แลกเปลี่ยนความรู้ด้วยความสุภาพและอิงข้อเท็จจริงทางวิชาการ<br />
-                  2. สนับสนุนการแชร์ Node ความรู้ที่มีการตรวจสอบ (Verified Node) เพื่อลด AI Slop<br />
-                  3. ไม่แชร์ความลับองค์กรหรือ API Key สาธารณะเด็ดขาด
+                  {lt.rulesDesc}
                 </p>
               </div>
             </div>
-
+ 
             {/* Main Content Area */}
             <div className="lg:col-span-3">
               {activeSpaceTab === 'feed' && (
@@ -532,30 +1017,30 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                         <textarea
                           value={newPostContent}
                           onChange={(e) => setNewPostContent(e.target.value)}
-                          placeholder="เขียนอะไรบางอย่างเพื่อแบ่งปันข้อมูลให้กับคนในกลุ่มสเปซนี้..."
+                          placeholder={lt.postPlaceholder}
                           className="flex-1 min-h-[80px] p-3 border border-slate-200 rounded-xl text-sm focus:ring-1 focus:ring-indigo-500 focus:outline-none focus:bg-slate-50/30 text-slate-800"
                           required
                         />
                       </div>
                       <div className="flex justify-between items-center border-t border-slate-100 pt-3">
-                        <span className="text-xs text-slate-400 font-mono">แชร์ข้อมูลได้อย่างอิสระ</span>
+                        <span className="text-xs text-slate-400 font-mono">Workspace Feed</span>
                         <button
                           type="submit"
                           disabled={isSpaceActionLoading || !newPostContent.trim()}
                           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md transition-all flex items-center gap-1 cursor-pointer"
                         >
-                          <Send className="w-3.5 h-3.5" /> โพสต์เลย
+                          <Send className="w-3.5 h-3.5" /> {lt.postButton}
                         </button>
                       </div>
                     </form>
                   ) : (
                     <div className="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-5 text-center">
-                      <p className="text-sm text-indigo-700 font-semibold mb-2">เฉพาะสมาชิกกลุ่มเท่านั้นที่จะสามารถตั้งโพสต์และแสดงความคิดเห็นได้</p>
+                      <p className="text-sm text-indigo-700 font-semibold mb-2">{language === 'th' ? 'เฉพาะสมาชิกกลุ่มเท่านั้นที่จะสามารถตั้งโพสต์และแสดงความคิดเห็นได้' : 'Only members can write posts and comment.'}</p>
                       <button
                         onClick={handleJoinSpace}
                         className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 cursor-pointer"
                       >
-                        กดเข้าร่วมกลุ่มเพื่อโพสต์
+                        {lt.joinSpace}
                       </button>
                     </div>
                   )}
@@ -564,7 +1049,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                   <div className="space-y-4">
                     {spacePosts.length === 0 ? (
                       <div className="bg-white border border-slate-200 border-dashed rounded-2xl p-12 text-center text-slate-400">
-                        ไม่มีโพสต์ในขณะนี้ เริ่มเขียนโพสต์แรกกันเลย!
+                        {language === 'th' ? 'ไม่มีโพสต์ในขณะนี้ เริ่มเขียนโพสต์แรกกันเลย!' : 'No posts yet. Start by writing the first post!'}
                       </div>
                     ) : (
                       spacePosts.map((post: any) => {
@@ -607,12 +1092,12 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                                 }`}
                               >
                                 <Heart className={`w-4 h-4 ${hasLiked ? 'fill-red-600 text-red-600' : ''}`} />
-                                ถูกใจ ({post.likes?.length || 0})
+                                {language === 'th' ? 'ถูกใจ' : 'Like'} ({post.likes?.length || 0})
                               </button>
                               
                               <span className="flex items-center gap-1.5 text-slate-500 text-xs font-bold">
                                 <MessageSquare className="w-4 h-4" />
-                                ความคิดเห็น ({post.comments?.length || 0})
+                                {language === 'th' ? 'ความคิดเห็น' : 'Comments'} ({post.comments?.length || 0})
                               </span>
                             </div>
 
@@ -647,7 +1132,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                                   <input
                                     type="text"
                                     required
-                                    placeholder="แสดงความคิดเห็นต่อโพสต์นี้..."
+                                    placeholder={lt.commentPlaceholder}
                                     value={newCommentTexts[post.id] || ''}
                                     onChange={(e) => setNewCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))}
                                     className="flex-1 px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none focus:bg-white text-slate-800"
@@ -656,11 +1141,11 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                                     type="submit"
                                     className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 cursor-pointer"
                                   >
-                                    ส่ง
+                                    {lt.send}
                                   </button>
                                 </form>
                               ) : (
-                                <p className="text-[10px] text-slate-400 font-bold text-center">เฉพาะสมาชิกที่เข้าร่วมกลุ่มเท่านั้นที่จะแสดงความเห็นได้</p>
+                                <p className="text-[10px] text-slate-400 font-bold text-center">{language === 'th' ? 'เฉพาะสมาชิกที่เข้าร่วมกลุ่มเท่านั้นที่จะแสดงความเห็นได้' : 'Only space members can comment.'}</p>
                               )}
                             </div>
                           </div>
@@ -678,7 +1163,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                   <div className="w-full md:w-60 border-r border-slate-100 bg-slate-50/60 p-4 flex flex-col">
                     <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest mb-3 px-1 flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                      สมาชิกที่คุยล่าสุด
+                      {language === 'th' ? 'สมาชิกที่คุยล่าสุด' : 'Recent Active Members'}
                     </h4>
                     
                     <div className="flex-1 overflow-y-auto space-y-2">
@@ -701,8 +1186,8 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                   <div className="flex-1 flex flex-col h-full bg-white">
                     <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/40">
                       <div>
-                        <h4 className="font-extrabold text-slate-900 text-sm">ห้องแชทสเปซเรียลไทม์ (Live Workspace Chat)</h4>
-                        <p className="text-[10px] text-slate-400 font-semibold uppercase mt-0.5">การสนทนาที่ถูกตรวจสอบผ่านโมเดลตรวจสอบของกลุ่ม</p>
+                        <h4 className="font-extrabold text-slate-900 text-sm">{language === 'th' ? 'ห้องแชทสเปซเรียลไทม์ (Live Workspace Chat)' : 'Live Workspace Chat'}</h4>
+                        <p className="text-[10px] text-slate-400 font-semibold uppercase mt-0.5">{language === 'th' ? 'การสนทนาที่ถูกตรวจสอบผ่านโมเดลตรวจสอบของกลุ่ม' : 'Conversations monitored through verification models'}</p>
                       </div>
                       <span className="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full">
                         Secure Connection
@@ -713,7 +1198,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                     <div className="flex-1 p-4 overflow-y-auto bg-slate-50/20 space-y-4 flex flex-col">
                       {spaceChats.length === 0 ? (
                         <div className="text-center py-20 text-slate-400 text-xs">
-                          ห้องแชทเงียบเหงาจัง... พิมพ์อะไรบางอย่างเพื่อเริ่มคุยกันเลย!
+                          {language === 'th' ? 'ห้องแชทเงียบเหงาจัง... พิมพ์อะไรบางอย่างเพื่อเริ่มคุยกันเลย!' : 'The chat room is empty... Type something to start talking!'}
                         </div>
                       ) : (
                         spaceChats.map((chat: any) => {
@@ -752,19 +1237,19 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                           required
                           value={newSpaceChatMsg}
                           onChange={(e) => setNewSpaceChatMsg(e.target.value)}
-                          placeholder="พิมพ์ข้อความคุยกับทีม..."
+                          placeholder={lt.chatPlaceholder}
                           className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:bg-white text-slate-800"
                         />
                         <button
                           type="submit"
                           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1 shadow-md cursor-pointer"
                         >
-                          <Send className="w-3.5 h-3.5" /> ส่ง
+                          <Send className="w-3.5 h-3.5" /> {lt.send}
                         </button>
                       </form>
                     ) : (
                       <div className="p-3 text-center border-t border-slate-100 bg-slate-50 text-xs font-bold text-slate-400">
-                        เฉพาะสมาชิกกลุ่มเท่านั้นที่จะแชทได้ในห้องนี้
+                        {language === 'th' ? 'เฉพาะสมาชิกกลุ่มเท่านั้นที่จะแชทได้ในห้องนี้' : 'Only space members can chat in this room.'}
                       </div>
                     )}
                   </div>
@@ -779,10 +1264,10 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                     <form onSubmit={handleInviteMember} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
                       <div>
                         <h4 className="text-sm font-extrabold text-slate-900 tracking-tight flex items-center gap-1.5">
-                          <Plus className="w-4 h-4 text-indigo-600" /> เพิ่มสมาชิกใหม่เข้ากลุ่มสเปซ (Add Members)
+                          <Plus className="w-4 h-4 text-indigo-600" /> {lt.addMemberTitle}
                         </h4>
                         <p className="text-xs text-slate-500 mt-1">
-                          ในฐานะ Admin คุณสามารถค้นหารายชื่อผู้ใช้และบอท เพื่อเพิ่มความร่วมมือเข้าสู่กลุ่มได้ทันที
+                          {lt.addMemberDesc}
                         </p>
                       </div>
 
@@ -793,7 +1278,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                           onChange={(e) => setInviteUserId(e.target.value)}
                           className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 text-slate-800"
                         >
-                          <option value="">-- เลือกผู้ใช้ที่จะดึงเข้ากลุ่ม --</option>
+                          <option value="">-- {language === 'th' ? 'เลือกผู้ใช้ที่จะดึงเข้ากลุ่ม' : 'Select user to add'} --</option>
                           {allIdentities
                             .filter(id => id.id !== profile.id && !spaceMembers.some(m => m.identityId === id.id))
                             .map(id => (
@@ -818,7 +1303,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                           disabled={isSpaceActionLoading || !inviteUserId}
                           className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-md transition-colors cursor-pointer"
                         >
-                          เพิ่มเข้าสเปซ
+                          {lt.addMemberBtn}
                         </button>
                       </div>
                     </form>
@@ -852,7 +1337,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                             <button
                               onClick={() => handleRemoveMember(member.identityId)}
                               className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer"
-                              title="ลบสมาชิก"
+                              title={language === 'th' ? 'ลบสมาชิก' : 'Remove member'}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -869,19 +1354,19 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
                   <div>
                     <h4 className="text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                      <Settings className="w-5 h-5 text-indigo-600" /> ตั้งค่าสเปซกลุ่มความร่วมมือ (Space Settings)
+                      <Settings className="w-5 h-5 text-indigo-600" /> {language === 'th' ? 'ตั้งค่าสเปซกลุ่มความร่วมมือ (Space Settings)' : 'Space Settings'}
                     </h4>
                     <p className="text-xs text-slate-500 mt-1">
-                      จัดการการเข้าถึง ความเป็นส่วนตัว และระเบียบความปลอดภัยภายในกลุ่มสเปซ
+                      {language === 'th' ? 'จัดการการเข้าถึง ความเป็นส่วนตัว และระเบียบความปลอดภัยภายในกลุ่มสเปซ' : 'Manage access, privacy, and security regulations within the group space'}
                     </p>
                   </div>
 
                   <div className="space-y-4 border-t border-slate-100 pt-4">
                     <div className="flex items-start justify-between gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50/50">
                       <div>
-                        <h5 className="text-sm font-bold text-slate-900">เปลี่ยนประเภทความเป็นส่วนตัว (Privacy Mode)</h5>
+                        <h5 className="text-sm font-bold text-slate-900">{language === 'th' ? 'เปลี่ยนประเภทความเป็นส่วนตัว (Privacy Mode)' : 'Change Privacy Mode'}</h5>
                         <p className="text-xs text-slate-500 mt-1 max-w-lg leading-relaxed">
-                          หากตั้งเป็น <strong>ส่วนตัว (Private)</strong> คนนอกกลุ่มจะไม่เห็นโพสต์ ข้อมูลสมาชิก และแชทกลุ่ม จะเห็นได้เฉพาะชื่อและประวัติตั้งต้นเท่านั้น
+                          {language === 'th' ? 'หากตั้งเป็น ส่วนตัว (Private) คนนอกกลุ่มจะไม่เห็นโพสต์ ข้อมูลสมาชิก และแชทกลุ่ม จะเห็นได้เฉพาะชื่อและประวัติตั้งต้นเท่านั้น' : 'If set to Private, non-members will not see posts, member details, or chat. Only public name and handle will be visible.'}
                         </p>
                       </div>
 
@@ -910,11 +1395,11 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                     </div>
 
                     <div className="p-4 rounded-xl border border-slate-200">
-                      <h5 className="text-sm font-bold text-slate-900 mb-2">ข้อมูลผู้สร้าง (Owner Metadata)</h5>
+                      <h5 className="text-sm font-bold text-slate-900 mb-2">{language === 'th' ? 'ข้อมูลผู้สร้าง (Owner Metadata)' : 'Owner Metadata'}</h5>
                       <div className="text-xs text-slate-500 font-mono space-y-1">
-                        <div>สเปซ ID: {profile.id}</div>
-                        <div>แฮนเดิลอ้างอิง: {profile.handle}</div>
-                        <div>บทบาทของคุณ: Admin ของกลุ่ม</div>
+                        <div>{language === 'th' ? 'สเปซ ID' : 'Space ID'}: {profile.id}</div>
+                        <div>{language === 'th' ? 'แฮนเดิลอ้างอิง' : 'Handle'}: {profile.handle}</div>
+                        <div>{language === 'th' ? 'บทบาทของคุณ: Admin ของกลุ่ม' : 'Your Role: Group Admin'}</div>
                       </div>
                     </div>
                   </div>
@@ -981,7 +1466,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                         : 'bg-blue-600 hover:bg-blue-700 text-white'
                     }`}
                   >
-                    {isFollowLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
+                    {isFollowLoading ? '...' : isFollowing ? lt.following : lt.follow}
                   </button>
                   {isFollowing && (
                     <label className="flex items-center gap-1 cursor-pointer text-[10px] uppercase font-bold text-slate-500 border-l border-slate-200 pl-2">
@@ -991,7 +1476,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                         onChange={(e) => handleNotifyAllToggle(e.target.checked)}
                         className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 mr-1"
                       />
-                      Notify All
+                      {language === 'th' ? 'แจ้งเตือนทั้งหมด' : 'Notify All'}
                     </label>
                   )}
                 </div>
@@ -1002,7 +1487,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                   onClick={() => setIsMessageModalOpen(true)}
                   className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-sm font-semibold rounded-lg shadow-sm transition-colors"
                 >
-                  Send Message
+                  {lt.sendMessage}
                 </button>
               )}
             </div>
@@ -1011,30 +1496,30 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
           <div className="flex flex-wrap gap-x-8 gap-y-4 mb-6 text-sm text-slate-600">
             <div className="flex items-center gap-2">
               <Briefcase className="w-4 h-4 text-slate-400" />
-              <span>Type: <strong className="text-slate-900">{profile.type}</strong></span>
+              <span>{lt.type}: <strong className="text-slate-900">{profile.type}</strong></span>
             </div>
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-slate-400" />
-              <span>Visibility: <strong className="text-slate-900">{profile.visibility}</strong></span>
+              <span>{lt.visibility || 'Visibility'}: <strong className="text-slate-900">{profile.visibility}</strong></span>
             </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
             <div>
               <div className="text-xl font-bold text-slate-900">{profile.followers.human.toLocaleString()}</div>
-              <div className="text-xs text-slate-500 font-medium">Human Followers</div>
+              <div className="text-xs text-slate-500 font-medium">{lt.humanFollowers}</div>
             </div>
             <div>
               <div className="text-xl font-bold text-slate-900">{profile.followers.ai.toLocaleString()}</div>
-              <div className="text-xs text-slate-500 font-medium">AI Followers</div>
+              <div className="text-xs text-slate-500 font-medium">{lt.aiFollowers}</div>
             </div>
             <div>
               <div className="text-xl font-bold text-slate-900">{profile.followers.organization.toLocaleString()}</div>
-              <div className="text-xs text-slate-500 font-medium">Organizations</div>
+              <div className="text-xs text-slate-500 font-medium">{lt.organizations}</div>
             </div>
             <div>
               <div className="text-xl font-bold text-slate-900">{profile.followers.enterprise.toLocaleString()}</div>
-              <div className="text-xs text-slate-500 font-medium">Enterprise Systems</div>
+              <div className="text-xs text-slate-500 font-medium">{lt.enterprise}</div>
             </div>
           </div>
 
@@ -1055,7 +1540,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
           {/* Trust Profile */}
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Shield className="w-5 h-5 text-green-600" /> Trust Profile
+              <Shield className="w-5 h-5 text-green-600" /> {lt.trustProfile}
             </h2>
             <div className="space-y-4">
               {Object.entries(profile.trustProfile).map(([key, value]) => (
@@ -1078,11 +1563,11 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
           {/* Badges & Verifications */}
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Award className="w-5 h-5 text-amber-500" /> Verifications & Badges
+              <Award className="w-5 h-5 text-amber-500" /> {language === 'th' ? 'การรับรองและเกียรติบัตร' : 'Verifications & Badges'}
             </h2>
             
             <div className="mb-4">
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Verifications</h3>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{lt.verifications}</h3>
               <div className="flex flex-col gap-2">
                 {profile.verifications.map(v => (
                   <div key={v} className="flex items-center gap-2 text-sm text-slate-700 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
@@ -1093,7 +1578,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
             </div>
 
             <div>
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Badges</h3>
+              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{lt.badges}</h3>
               <div className="flex flex-wrap gap-2">
                 {profile.badges.map(b => (
                   <div key={b} className="flex items-center gap-1.5 text-xs font-bold text-amber-900 bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200">
@@ -1112,7 +1597,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
           {/* Reputation Dimensions */}
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Target className="w-5 h-5 text-purple-600" /> Reputation Dimensions
+              <Target className="w-5 h-5 text-purple-600" /> {lt.reputation}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {Object.entries(profile.reputation).map(([key, value]) => (
@@ -1127,7 +1612,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
           {/* Expertise Graph */}
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Star className="w-5 h-5 text-blue-600" /> Expertise Graph
+              <Star className="w-5 h-5 text-blue-600" /> {lt.expertise}
             </h2>
             <div className="flex flex-wrap gap-3">
               {profile.expertise.map((exp, idx) => (
@@ -1152,11 +1637,11 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
           {/* Activity Timeline */}
           <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <History className="w-5 h-5 text-slate-600" /> Transparent Activity Timeline
+              <History className="w-5 h-5 text-slate-600" /> {language === 'th' ? 'ประวัติกิจกรรมความโปร่งใส' : 'Transparent Activity Timeline'}
             </h2>
             <div className="space-y-6">
               {activities.length === 0 ? (
-                <div className="text-sm text-slate-500">No activity recorded yet.</div>
+                <div className="text-sm text-slate-500">{language === 'th' ? 'ยังไม่มีประวัติกิจกรรมบันทึกไว้' : 'No activity recorded yet.'}</div>
               ) : (
                 activities.map((activity, idx) => (
                   <div key={activity.id} className="relative pl-6">
@@ -1196,7 +1681,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
               <div>
                 <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                   {getIdentityIcon(profile.type, "w-4 h-4 text-slate-500")}
-                  Direct Message with {profile.name}
+                  {language === 'th' ? `ส่งข้อความส่วนตัวถึง ${profile.name}` : `Direct Message with ${profile.name}`}
                 </h3>
                 <p className="text-[10px] text-slate-500 font-mono mt-0.5">{profile.handle}</p>
               </div>
@@ -1204,7 +1689,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                 onClick={() => setIsMessageModalOpen(false)}
                 className="text-slate-400 hover:text-slate-600 font-semibold text-xs bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-md transition-all"
               >
-                Close
+                {language === 'th' ? 'ปิด' : 'Close'}
               </button>
             </div>
 
@@ -1212,7 +1697,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
             <div className="flex-1 p-4 overflow-y-auto bg-slate-50 space-y-3">
               {messages.length === 0 ? (
                 <div className="text-center py-12 text-slate-400 text-xs">
-                  No conversation history. Send a secure direct message to start!
+                  {language === 'th' ? 'ยังไม่มีประวัติการพูดคุย ส่งข้อความส่วนตัวที่ปลอดภัยเพื่อเริ่มต้น!' : 'No conversation history. Send a secure direct message to start!'}
                 </div>
               ) : (
                 messages.map((m: any) => {
@@ -1238,7 +1723,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
               <input
                 required
                 type="text"
-                placeholder="Type your message..."
+                placeholder={language === 'th' ? 'พิมพ์ข้อความของคุณ...' : 'Type your message...'}
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white"
@@ -1248,7 +1733,7 @@ export default function IdentityProfile({ identity }: IdentityProfileProps) {
                 disabled={isSendingMessage || !newMessage.trim()}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors disabled:opacity-50"
               >
-                {isSendingMessage ? '...' : 'Send'}
+                {isSendingMessage ? '...' : (language === 'th' ? 'ส่ง' : 'Send')}
               </button>
             </form>
           </div>

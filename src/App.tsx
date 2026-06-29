@@ -41,6 +41,61 @@ export default function App() {
         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent hover:border-slate-200'
     }`;
   };
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    collab: true,
+    tools: false,
+    support: false,
+  });
+
+  const toggleGroup = (group: string) => {
+    setOpenGroups(prev => ({
+      ...prev,
+      [group]: !prev[group]
+    }));
+  };
+
+  useEffect(() => {
+    const path = location.pathname;
+    if (['/trending', '/challenges', '/organizations', '/explore/tags'].some(p => path.startsWith(p))) {
+      setOpenGroups(prev => ({ ...prev, collab: true }));
+    } else if (['/analytics', '/subscriptions', '/developer'].some(p => path.startsWith(p))) {
+      setOpenGroups(prev => ({ ...prev, tools: true }));
+    } else if (['/settings', '/support', '/reports', '/about'].some(p => path.startsWith(p))) {
+      setOpenGroups(prev => ({ ...prev, support: true }));
+    }
+  }, [location.pathname]);
+
+  const getSubLinkClass = (path: string) => {
+    const isActive = path === '/' 
+      ? location.pathname === '/' 
+      : location.pathname.startsWith(path);
+    
+    return `group block pl-4 pr-3 py-1.5 rounded-lg text-[13px] font-semibold flex items-center justify-between transition-all border-l-2 ${
+      isActive
+        ? 'bg-blue-50/70 text-blue-700 border-blue-500'
+        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 border-transparent'
+    }`;
+  };
+
+  const renderGroupHeader = (key: string, label: string, icon: React.ReactNode, count: number) => {
+    const isOpen = openGroups[key];
+    return (
+      <button
+        onClick={() => toggleGroup(key)}
+        className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:bg-slate-50/50 rounded-lg transition-colors mt-4 mb-1 text-left cursor-pointer group"
+      >
+        <span className="flex items-center gap-2">
+          {icon}
+          <span>{label}</span>
+          <span className="normal-case text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 font-medium group-hover:bg-slate-200">
+            {count}
+          </span>
+        </span>
+        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+    );
+  };
+
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const [identities, setIdentities] = useState<Identity[]>([]);
   const [currentIdentity, setCurrentIdentity] = useState<Identity | null>(null);
@@ -483,6 +538,11 @@ export default function App() {
         {/* Left Sidebar - Navigation (Responsive) */}
         <aside className={`${isMobileMenuOpen ? 'fixed inset-0 z-40 bg-white flex flex-col pt-16 px-4 overflow-y-auto' : 'hidden'} lg:block lg:static lg:w-64 lg:shrink-0`}>
           <nav className="space-y-1">
+            {/* Group 1: Core Directory (Always visible & prominent) */}
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-3">
+              {t('nav.group.core')}
+            </div>
+
             <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/')}>
               <span className="flex items-center gap-2.5">
                 <Rss className="w-4 h-4 text-blue-600" />
@@ -494,34 +554,6 @@ export default function App() {
               <span className="flex items-center gap-2.5">
                 <Layers className="w-4 h-4 text-amber-600" />
                 <span>{t('nav.domains')}</span>
-              </span>
-            </Link>
-
-            <Link to="/trending" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/trending')}>
-              <span className="flex items-center gap-2.5">
-                <Award className="w-4 h-4 text-indigo-600" />
-                <span>{t('nav.trending')}</span>
-              </span>
-            </Link>
-
-            <Link to="/challenges" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/challenges')}>
-              <span className="flex items-center gap-2.5">
-                <Trophy className="w-4 h-4 text-violet-600" />
-                <span>{t('nav.challenges')}</span>
-              </span>
-            </Link>
-
-            <Link to="/search" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/search')}>
-              <span className="flex items-center gap-2.5">
-                <Search className="w-4 h-4 text-blue-600" />
-                <span>{t('nav.search')}</span>
-              </span>
-            </Link>
-
-            <Link to="/subscriptions" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/subscriptions')}>
-              <span className="flex items-center gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>{t('nav.subscriptions')}</span>
               </span>
             </Link>
 
@@ -541,61 +573,107 @@ export default function App() {
               )}
             </Link>
 
-            <Link to="/organizations" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/organizations')}>
+            <Link to="/search" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/search')}>
               <span className="flex items-center gap-2.5">
-                <Box className="w-4 h-4 text-blue-600" />
-                <span>{t('nav.organizations')}</span>
+                <Search className="w-4 h-4 text-blue-600" />
+                <span>{t('nav.search')}</span>
               </span>
             </Link>
 
-            <Link to="/explore/tags" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/explore/tags')}>
-              <span className="flex items-center gap-2.5">
-                <Tag className="w-4 h-4 text-blue-600" />
-                <span>{t('nav.tags')}</span>
-              </span>
-            </Link>
+            {/* Group 2: Collaboration & Activities */}
+            {renderGroupHeader('collab', t('nav.group.collab'), <Box className="w-3.5 h-3.5 text-slate-400" />, 4)}
+            {openGroups.collab && (
+              <div className="space-y-0.5 pl-1 border-l border-slate-100 ml-4 animate-in fade-in duration-150">
+                <Link to="/challenges" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/challenges')}>
+                  <span className="flex items-center gap-2">
+                    <Trophy className="w-3.5 h-3.5 text-violet-500" />
+                    <span>{t('nav.challenges')}</span>
+                  </span>
+                </Link>
 
-            <Link to="/analytics" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/analytics')}>
-              <span className="flex items-center gap-2.5">
-                <BarChart3 className="w-4 h-4 text-indigo-600" />
-                <span>{t('nav.analytics')}</span>
-              </span>
-            </Link>
+                <Link to="/organizations" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/organizations')}>
+                  <span className="flex items-center gap-2">
+                    <Box className="w-3.5 h-3.5 text-blue-500" />
+                    <span>{t('nav.organizations')}</span>
+                  </span>
+                </Link>
 
-            <Link to="/developer" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/developer')}>
-              <span className="flex items-center gap-2.5">
-                <Terminal className="w-4 h-4 text-slate-600" />
-                <span>{t('nav.developer')}</span>
-              </span>
-            </Link>
+                <Link to="/trending" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/trending')}>
+                  <span className="flex items-center gap-2">
+                    <Award className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>{t('nav.trending')}</span>
+                  </span>
+                </Link>
 
-            <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/settings')}>
-              <span className="flex items-center gap-2.5">
-                <Settings className="w-4 h-4 text-slate-600" />
-                <span>{t('nav.settings')}</span>
-              </span>
-            </Link>
+                <Link to="/explore/tags" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/explore/tags')}>
+                  <span className="flex items-center gap-2">
+                    <Tag className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>{t('nav.tags')}</span>
+                  </span>
+                </Link>
+              </div>
+            )}
 
-            <Link to="/support" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/support')}>
-              <span className="flex items-center gap-2.5">
-                <Bug className="w-4 h-4 text-rose-500" />
-                <span>{t('nav.support')}</span>
-              </span>
-            </Link>
+            {/* Group 3: Platform & Analytics */}
+            {renderGroupHeader('tools', t('nav.group.tools'), <BarChart3 className="w-3.5 h-3.5 text-slate-400" />, 3)}
+            {openGroups.tools && (
+              <div className="space-y-0.5 pl-1 border-l border-slate-100 ml-4 animate-in fade-in duration-150">
+                <Link to="/analytics" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/analytics')}>
+                  <span className="flex items-center gap-2">
+                    <BarChart3 className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>{t('nav.analytics')}</span>
+                  </span>
+                </Link>
 
-            <Link to="/reports" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/reports')}>
-              <span className="flex items-center gap-2.5">
-                <AlertTriangle className="w-4 h-4 text-rose-500" />
-                <span>{t('nav.reports')}</span>
-              </span>
-            </Link>
+                <Link to="/subscriptions" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/subscriptions')}>
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>{t('nav.subscriptions')}</span>
+                  </span>
+                </Link>
 
-            <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className={getLinkClass('/about')}>
-              <span className="flex items-center gap-2.5">
-                <BookOpen className="w-4 h-4 text-indigo-600" />
-                <span>{t('nav.about')}</span>
-              </span>
-            </Link>
+                <Link to="/developer" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/developer')}>
+                  <span className="flex items-center gap-2">
+                    <Terminal className="w-3.5 h-3.5 text-slate-500" />
+                    <span>{t('nav.developer')}</span>
+                  </span>
+                </Link>
+              </div>
+            )}
+
+            {/* Group 4: Account & Support */}
+            {renderGroupHeader('support', t('nav.group.support'), <Settings className="w-3.5 h-3.5 text-slate-400" />, 4)}
+            {openGroups.support && (
+              <div className="space-y-0.5 pl-1 border-l border-slate-100 ml-4 animate-in fade-in duration-150">
+                <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/settings')}>
+                  <span className="flex items-center gap-2">
+                    <Settings className="w-3.5 h-3.5 text-slate-500" />
+                    <span>{t('nav.settings')}</span>
+                  </span>
+                </Link>
+
+                <Link to="/support" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/support')}>
+                  <span className="flex items-center gap-2">
+                    <Bug className="w-3.5 h-3.5 text-rose-500" />
+                    <span>{t('nav.support')}</span>
+                  </span>
+                </Link>
+
+                <Link to="/reports" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/reports')}>
+                  <span className="flex items-center gap-2">
+                    <AlertTriangle className="w-3.5 h-3.5 text-rose-500" />
+                    <span>{t('nav.reports')}</span>
+                  </span>
+                </Link>
+
+                <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className={getSubLinkClass('/about')}>
+                  <span className="flex items-center gap-2">
+                    <BookOpen className="w-3.5 h-3.5 text-indigo-500" />
+                    <span>{t('nav.about')}</span>
+                  </span>
+                </Link>
+              </div>
+            )}
           </nav>
 
           <div className="mt-8">

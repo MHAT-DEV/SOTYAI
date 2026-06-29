@@ -9,8 +9,225 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { ScrollWrapper } from './ScrollWrapper';
+import { useLanguage } from '../context/LanguageContext';
+
+const localTranslations: Record<string, Record<string, string>> = {
+  th: {
+    loading: 'กำลังโหลดพอร์ทัลผู้พัฒนา...',
+    devCenter: 'ศูนย์พัฒนา (Developer Center)',
+    title: 'พอร์ทัลผู้พัฒนา Human-AI',
+    subtitle: 'ผสานรวม SOTYAI เป็นโหนดร่วมมือของมนุษย์และ AI เข้าถึงเครื่องมือ MCP, API V2, โทเค็นความปลอดภัย และระบบวัดระยะทางสด',
+    gatewayOnline: 'เกตเวย์ V2: ออนไลน์',
+    mcpProtocol: 'โปรโตคอล MCP v1.0',
+    overview: 'ภาพรวม',
+    metrics: 'ตัวชี้วัดเกตเวย์',
+    explorer: 'ตัวสำรวจ API',
+    accessTools: 'การเข้าถึงและเครื่องมือ',
+    credentials: 'ข้อมูลประจำตัว API',
+    spec: 'ข้อกำหนด MCP',
+    agents: 'บอทเอเจนต์ที่ลงทะเบียน',
+    integrations: 'การผสานรวม',
+    sdk: 'SDK และโค้ดตัวอย่าง',
+    webhooks: 'เว็บฮุคและ SSE',
+    sdkRef: 'ข้อมูลอ้างอิง SDK',
+    sdkDesc: 'ผสานรวมบริบทที่มนุษย์คัดสรรและลูปฉันทามติ AI อัตโนมัติโดยตรงเข้ากับไปป์ไลน์ CI/CD ของคุณ',
+    viewOpenApi: 'ดูข้อกำหนด OpenAPI →'
+  },
+  en: {
+    loading: 'Loading developer platform portal...',
+    devCenter: 'Developer Center',
+    title: 'Human-AI Developer Portal',
+    subtitle: 'Integrate SOTYAI as a Human+AI collaborative node. Access MCP Tools, versioned API V2, secure tokens, and live telemetry.',
+    gatewayOnline: 'V2 Gateway: Online',
+    mcpProtocol: 'MCP Protocol v1.0',
+    overview: 'Overview',
+    metrics: 'Gateway Metrics',
+    explorer: 'API Explorer',
+    accessTools: 'Access & Tools',
+    credentials: 'API Credentials',
+    spec: 'MCP Specification',
+    agents: 'Registered Agents',
+    integrations: 'Integrations',
+    sdk: 'SDK & Code Snippets',
+    webhooks: 'Webhooks & SSE',
+    sdkRef: 'SDK Reference',
+    sdkDesc: 'Integrate human-curated context and automated AI consensus loops directly into your CI/CD pipelines.',
+    viewOpenApi: 'View OpenAPI Spec →'
+  },
+  ja: {
+    loading: '開発者ポータルを読み込み中...',
+    devCenter: 'デベロッパーセンター',
+    title: 'Human-AI 開発者ポータル',
+    subtitle: 'SOTYAIを人間とAIの共同ノードとして統合。MCPツール、API V2、安全なトークン、リアルタイムテレメトリにアクセス。',
+    gatewayOnline: 'V2ゲートウェイ: オンライン',
+    mcpProtocol: 'MCPプロトコル v1.0',
+    overview: '概要',
+    metrics: 'ゲートウェイメトリクス',
+    explorer: 'APIエクスプローラー',
+    accessTools: 'アクセスとツール',
+    credentials: 'API認証資格情報',
+    spec: 'MCP仕様',
+    agents: '登録済みエージェント',
+    integrations: 'インテグレーション',
+    sdk: 'SDKとコードスニペット',
+    webhooks: 'WebhookとSSE',
+    sdkRef: 'SDKリファレンス',
+    sdkDesc: '人間が厳選したコンテキストと自動化されたAI合意ループをCI/CDパイプラインに直接統合。',
+    viewOpenApi: 'OpenAPI仕様を表示 →'
+  },
+  zh: {
+    loading: '正在加载开发者门户...',
+    devCenter: '开发者中心',
+    title: 'Human-AI 开发者门户',
+    subtitle: '将 SOTYAI 整合为人机协同节点。访问 MCP 工具、版本化 API V2、安全令牌和实时遥测。',
+    gatewayOnline: 'V2 网关: 在线',
+    mcpProtocol: 'MCP 协议 v1.0',
+    overview: '概览',
+    metrics: '网关指标',
+    explorer: 'API 资源管理器',
+    accessTools: '访问与工具',
+    credentials: 'API 凭据',
+    spec: 'MCP 规范说明',
+    agents: '已注册代理',
+    integrations: '集成选项',
+    sdk: 'SDK 与代码片段',
+    webhooks: 'Webhooks 与 SSE',
+    sdkRef: 'SDK 参考手册',
+    sdkDesc: '将人工策划的上下文和自动化 AI 共识循环直接集成到您的 CI/CD 流程中。',
+    viewOpenApi: '查看 OpenAPI 规范 →'
+  },
+  ko: {
+    loading: '개발자 포털 로딩 중...',
+    devCenter: '개발자 센터',
+    title: '인간-AI 개발자 포털',
+    subtitle: 'SOTYAI를 인간+AI 협업 노드로 통합하세요. MCP 도구, 버전 관리 API V2, 보안 토큰 및 실시간 텔레메트리에 액세스할 수 있습니다.',
+    gatewayOnline: 'V2 게이트웨이: 온라인',
+    mcpProtocol: 'MCP 프로토콜 v1.0',
+    overview: '개요',
+    metrics: '게이트웨이 지표',
+    explorer: 'API 탐색기',
+    accessTools: '액세스 및 도구',
+    credentials: 'API 인증 정보',
+    spec: 'MCP 규격 사양',
+    agents: '등록된 에이전트',
+    integrations: '통합 및 연동',
+    sdk: 'SDK 및 코드 스니펫',
+    webhooks: '웹훅 및 SSE',
+    sdkRef: 'SDK 참조 문서',
+    sdkDesc: '인간이 큐레이션한 컨텍스트와 자동화된 AI 합의 루프를 CI/CD 파이프라인에 직접 통합하세요.',
+    viewOpenApi: 'OpenAPI 사양 보기 →'
+  },
+  de: {
+    loading: 'Entwicklerportal wird geladen...',
+    devCenter: 'Entwickler-Zentrum',
+    title: 'Mensch-KI-Entwicklerportal',
+    subtitle: 'Integrieren Sie SOTYAI als kollaborativen Mensch-KI-Knoten. Greifen Sie auf MCP-Tools, API V2, sichere Token und Live-Telemetrie zu.',
+    gatewayOnline: 'V2-Gateway: Online',
+    mcpProtocol: 'MCP-Protokoll v1.0',
+    overview: 'Übersicht',
+    metrics: 'Gateway-Metriken',
+    explorer: 'API-Explorer',
+    accessTools: 'Zugriff & Tools',
+    credentials: 'API-Zugangsdaten',
+    spec: 'MCP-Spezifikation',
+    agents: 'Registrierte Agenten',
+    integrations: 'Integrationen',
+    sdk: 'SDK & Code-Snippets',
+    webhooks: 'Webhooks & SSE',
+    sdkRef: 'SDK-Referenz',
+    sdkDesc: 'Integrieren Sie von Menschen kuratierte Kontexte und automatisierte KI-Konsensschleifen direkt in Ihre CI/CD-Pipelines.',
+    viewOpenApi: 'OpenAPI-Spezifikation anzeigen →'
+  },
+  fr: {
+    loading: 'Chargement du portail développeur...',
+    devCenter: 'Centre Développeur',
+    title: 'Portail Développeur Humain-IA',
+    subtitle: 'Intégrez SOTYAI comme nœud collaboratif Humain-IA. Accédez aux outils MCP, à l\'API V2, aux jetons sécurisés et à la télémétrie en direct.',
+    gatewayOnline: 'Passerelle V2 : En ligne',
+    mcpProtocol: 'Protocole MCP v1.0',
+    overview: 'Vue d\'ensemble',
+    metrics: 'Métriques Passerelle',
+    explorer: 'Explorateur API',
+    accessTools: 'Accès & Outils',
+    credentials: 'Identifiants API',
+    spec: 'Spécification MCP',
+    agents: 'Agents Enregistrés',
+    integrations: 'Intégrations',
+    sdk: 'SDK & Extraits de code',
+    webhooks: 'Webhooks & SSE',
+    sdkRef: 'Référence SDK',
+    sdkDesc: 'Intégrez le contexte sélectionné par l\'homme et des boucles de consensus d\'IA automatisées directement dans vos pipelines de CI/CD.',
+    viewOpenApi: 'Voir la spécification OpenAPI →'
+  },
+  es: {
+    loading: 'Cargando portal de desarrolladores...',
+    devCenter: 'Centro de Desarrolladores',
+    title: 'Portal de Desarrolladores Humano-IA',
+    subtitle: 'Integre SOTYAI como un nodo colaborativo Humano+IA. Acceda a herramientas MCP, API V2, tokens seguros y telemetría en vivo.',
+    gatewayOnline: 'Pasarela V2: En línea',
+    mcpProtocol: 'Protocolo MCP v1.0',
+    overview: 'Resumen',
+    metrics: 'Métricas de Pasarela',
+    explorer: 'Explorador API',
+    accessTools: 'Acceso y Herramientas',
+    credentials: 'Credenciales API',
+    spec: 'Especificación MCP',
+    agents: 'Agentes Registrados',
+    integrations: 'Integraciones',
+    sdk: 'SDK y fragmentos de código',
+    webhooks: 'Webhooks y SSE',
+    sdkRef: 'Referencia del SDK',
+    sdkDesc: 'Integre el contexto curado por humanos y los bucles de consenso de IA automatizados directamente en sus flujos de CI/CD.',
+    viewOpenApi: 'Ver especificación OpenAPI →'
+  },
+  ru: {
+    loading: 'Загрузка портала разработчиков...',
+    devCenter: 'Центр разработчиков',
+    title: 'Портал разработчиков Human-AI',
+    subtitle: 'Интегрируйте SOTYAI как совместный узел Человек+ИИ. Получите доступ к инструментам MCP, API V2, защищенным токенам и живой телеметрии.',
+    gatewayOnline: 'Шлюз V2: Активен',
+    mcpProtocol: 'Протокол MCP v1.0',
+    overview: 'Обзор',
+    metrics: 'Метрики шлюза',
+    explorer: 'API Проводник',
+    accessTools: 'Доступ и инструменты',
+    credentials: 'API Ключи',
+    spec: 'Спецификация MCP',
+    agents: 'Зарегистрированные агенты',
+    integrations: 'Интеграции',
+    sdk: 'SDK и примеры кода',
+    webhooks: 'Вебхуки и SSE',
+    sdkRef: 'Документация SDK',
+    sdkDesc: 'Интегрируйте курируемый человеком контекст и автоматизированные циклы консенсуса ИИ прямо в ваши конвейеры CI/CD.',
+    viewOpenApi: 'Посмотреть OpenAPI спецификацию →'
+  },
+  vi: {
+    loading: 'Đang tải cổng thông tin nhà phát triển...',
+    devCenter: 'Trung tâm phát triển',
+    title: 'Cổng thông tin nhà phát triển Human-AI',
+    subtitle: 'Tích hợp SOTYAI như một nút cộng tác Con người+AI. Truy cập Công cụ MCP, API V2 được tạo phiên bản, mã thông báo an toàn và đo lường từ xa trực tiếp.',
+    gatewayOnline: 'Cổng kết nối V2: Trực tuyến',
+    mcpProtocol: 'Giao thức MCP v1.0',
+    overview: 'Tổng quan',
+    metrics: 'Chỉ số cổng kết nối',
+    explorer: 'Trình khám phá API',
+    accessTools: 'Truy cập & Công cụ',
+    credentials: 'Thông tin xác thực API',
+    spec: 'Thông số kỹ thuật MCP',
+    agents: 'Đại lý đã đăng ký',
+    integrations: 'Tích hợp',
+    sdk: 'SDK & Đoạn mã mẫu',
+    webhooks: 'Webhooks & SSE',
+    sdkRef: 'Tài liệu tham khảo SDK',
+    sdkDesc: 'Tích hợp trực tiếp bối cảnh do con người tuyển chọn và các vòng lặp đồng thuận AI tự động vào quy trình CI/CD của bạn.',
+    viewOpenApi: 'Xem đặc tả OpenAPI →'
+  }
+};
 
 export default function DeveloperPortal() {
+  const { language } = useLanguage();
+  const lt = localTranslations[language] || localTranslations['en'];
+
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [aiAgents, setAiAgents] = useState<Identity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -258,7 +475,7 @@ export default function DeveloperPortal() {
     setTimeout(() => setCopiedText(null), 2000);
   };
 
-  if (loading || !identity) return <div className="py-12 text-center text-slate-500 font-medium">Loading developer platform portal...</div>;
+  if (loading || !identity) return <div className="py-12 text-center text-slate-500 font-medium">{lt.loading}</div>;
 
   const apiKeys = identity.apiCredentials?.filter(c => c.type === 'API Key') || [];
   const mcpTokens = aiAgents.flatMap(a => a.apiCredentials?.filter(c => c.type === 'MCP Token' || c.type === 'API Key') || []);
@@ -344,21 +561,21 @@ func main() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6 mb-8">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">Developer Center</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">{lt.devCenter}</span>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3 mt-2">
-            <Terminal className="w-8 h-8 text-blue-600" /> Human-AI Developer Portal
+            <Terminal className="w-8 h-8 text-blue-600" /> {lt.title}
           </h1>
           <p className="text-slate-500 mt-2 text-md">
-            Integrate SOTYAI as a Human+AI collaborative node. Access MCP Tools, versioned API V2, secure tokens, and live telemetry.
+            {lt.subtitle}
           </p>
         </div>
         <div className="flex gap-2">
           <span className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-green-50 text-green-700 border border-green-100">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            V2 Gateway: Online
+            {lt.gatewayOnline}
           </span>
           <span className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100">
-            MCP Protocol v1.0
+            {lt.mcpProtocol}
           </span>
         </div>
       </div>
@@ -367,64 +584,64 @@ func main() {
         {/* Navigation Sidebar */}
         <div className="lg:w-64 shrink-0">
           <nav className="space-y-1 bg-slate-50 p-2.5 rounded-2xl border border-slate-200 shadow-sm">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3.5 pt-2 pb-1.5">Overview</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3.5 pt-2 pb-1.5">{lt.overview}</p>
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
             >
-              <Activity className="w-4.5 h-4.5 text-blue-500" /> Gateway Metrics
+              <Activity className="w-4.5 h-4.5 text-blue-500" /> {lt.metrics}
             </button>
             <button
               onClick={() => setActiveTab('explorer')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === 'explorer' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
             >
-              <Sliders className="w-4.5 h-4.5 text-amber-500" /> API Explorer
+              <Sliders className="w-4.5 h-4.5 text-amber-500" /> {lt.explorer}
             </button>
 
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3.5 pt-4 pb-1.5">Access & Tools</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3.5 pt-4 pb-1.5">{lt.accessTools}</p>
             <button
               onClick={() => setActiveTab('api')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === 'api' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
             >
-              <Key className="w-4.5 h-4.5 text-emerald-500" /> API Credentials
+              <Key className="w-4.5 h-4.5 text-emerald-500" /> {lt.credentials}
             </button>
             <button
               onClick={() => setActiveTab('mcp')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === 'mcp' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
             >
-              <Shield className="w-4.5 h-4.5 text-purple-500" /> MCP Specification
+              <Shield className="w-4.5 h-4.5 text-purple-500" /> {lt.spec}
             </button>
             <button
               onClick={() => setActiveTab('agents')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === 'agents' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
             >
-              <Bot className="w-4.5 h-4.5 text-pink-500" /> Registered Agents
+              <Bot className="w-4.5 h-4.5 text-pink-500" /> {lt.agents}
             </button>
 
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3.5 pt-4 pb-1.5">Integrations</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3.5 pt-4 pb-1.5">{lt.integrations}</p>
             <button
               onClick={() => setActiveTab('sdk')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === 'sdk' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
             >
-              <Code className="w-4.5 h-4.5 text-cyan-500" /> SDK & Code Snippets
+              <Code className="w-4.5 h-4.5 text-cyan-500" /> {lt.sdk}
             </button>
             <button
               onClick={() => setActiveTab('webhooks')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-semibold rounded-xl transition-all ${activeTab === 'webhooks' ? 'bg-slate-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
             >
-              <Webhook className="w-4.5 h-4.5 text-red-500" /> Webhooks & SSE
+              <Webhook className="w-4.5 h-4.5 text-red-500" /> {lt.webhooks}
             </button>
           </nav>
 
           <div className="mt-6 bg-blue-50 p-4 rounded-xl border border-blue-100 shadow-sm">
             <h4 className="text-sm font-bold text-blue-900 flex items-center gap-1.5">
-              <BookOpen className="w-4 h-4" /> SDK Reference
+              <BookOpen className="w-4 h-4" /> {lt.sdkRef}
             </h4>
             <p className="text-xs text-blue-800 mt-2 leading-relaxed">
-              Integrate human-curated context and automated AI consensus loops directly into your CI/CD pipelines.
+              {lt.sdkDesc}
             </p>
             <button onClick={() => setActiveTab('docs')} className="text-xs font-bold text-blue-600 mt-3 inline-flex items-center gap-1 hover:underline">
-              View OpenAPI Spec &rarr;
+              {lt.viewOpenApi}
             </button>
           </div>
         </div>

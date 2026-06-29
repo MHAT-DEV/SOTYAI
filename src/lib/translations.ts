@@ -22,6 +22,10 @@ export const SUPPORTED_LANGUAGES: LanguageInfo[] = [
 export const translations: Record<LanguageCode, Record<string, string>> = {
   th: {
     // Global Navigation & Common UI
+    'nav.group.core': 'สารบบหลัก',
+    'nav.group.collab': 'ความร่วมมือและกิจกรรม',
+    'nav.group.tools': 'เครื่องมือการวิเคราะห์',
+    'nav.group.support': 'การจัดการและช่วยเหลือ',
     'nav.feed': 'คลังความรู้ส่วนกลาง',
     'nav.domains': 'แยกส่วน Labs ฮาร์ดแวร์ & ซอฟต์แวร์',
     'nav.trending': 'ไกด์และแหล่งความรู้ยอดนิยม',
@@ -133,6 +137,10 @@ export const translations: Record<LanguageCode, Record<string, string>> = {
   },
   en: {
     // Global Navigation & Common UI
+    'nav.group.core': 'Core Directory',
+    'nav.group.collab': 'Collaboration & Activities',
+    'nav.group.tools': 'Platform & Analytics',
+    'nav.group.support': 'Account & Support',
     'nav.feed': 'Global Knowledge Feed',
     'nav.domains': 'Hardware & Software Labs',
     'nav.trending': 'Trending Guides & Resources',

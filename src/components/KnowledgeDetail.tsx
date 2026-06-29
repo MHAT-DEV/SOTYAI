@@ -6,6 +6,7 @@ import Markdown from 'react-markdown';
 import { formatDistanceToNow } from 'date-fns';
 import ReportModal from './ReportModal';
 import LinkPreviewBox from './LinkPreviewBox';
+import { ScrollWrapper } from './ScrollWrapper';
 
 interface KnowledgeDetailProps {
   identity: Identity | null;
@@ -166,7 +167,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
   };
 
   const handleShareLink = () => {
-    navigator.clipboard.writeText(`https://sotyai.network/knowledge/${ko?.id}`);
+    navigator.clipboard.writeText(`https://sotyai.com/knowledge/${ko?.id}`);
     triggerMetric('humanShares');
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
@@ -292,42 +293,9 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
 
             <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4 relative z-10">{ko.title}</h1>
             
-            <div className="flex flex-wrap items-center gap-4 relative z-10">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 text-sm text-slate-600 bg-white inline-flex px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
-                  <span>Authored by:</span>
-                  <Link to={`/identity/${ko.authorId}`} className="font-semibold text-blue-600 hover:underline">
-                    {ko.authorId === 'id_human_1' ? 'Alice Developer' : ko.authorId === 'id_org_1' ? 'OpenAI' : ko.authorId}
-                  </Link>
-                </div>
-
-                {identity && identity.id !== ko.authorId && (
-                  <div className="relative inline-flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm text-xs">
-                    <button
-                      onClick={handleFollowToggle}
-                      disabled={isFollowLoading}
-                      className={`font-bold transition-all px-2.5 py-1 rounded-md ${
-                        isFollowing
-                           ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                           : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
-                      }`}
-                    >
-                      {isFollowLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
-                    </button>
-                    {isFollowing && (
-                      <label className="flex items-center gap-1.5 cursor-pointer text-[10px] uppercase font-bold text-slate-500 border-l border-slate-200 pl-2">
-                        <input
-                          type="checkbox"
-                          checked={notifyAll}
-                          onChange={(e) => handleNotifyAllToggle(e.target.checked)}
-                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        Notify on all posts
-                      </label>
-                    )}
-                  </div>
-                )}
-
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-4 relative z-10">
+              <ScrollWrapper className="w-full sm:w-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-1 sm:pb-0">
+                <div className="flex items-center gap-3 w-max">
                 {identity && (
                   <button
                     onClick={() => setIsReportOpen(true)}
@@ -360,6 +328,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                   {copiedLink ? 'Link Copied! ✓' : 'Share / Copy Link'}
                 </button>
               </div>
+              </ScrollWrapper>
               
               <div className="flex flex-wrap gap-2">
                 {ko.categories?.map(c => (
@@ -470,6 +439,44 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                   )}
                 </section>
               )}
+
+              {/* Author Box */}
+              <div className="mt-12 bg-slate-50 p-6 rounded-2xl border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-sm">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Author / Contributor</span>
+                  <Link to={`/identity/${ko.authorId}`} className="text-lg font-extrabold text-blue-600 hover:text-blue-700 hover:underline">
+                    {ko.authorId === 'id_human_1' ? 'Alice Developer' : ko.authorId === 'id_org_1' ? 'OpenAI' : ko.authorId}
+                  </Link>
+                  <span className="text-sm font-medium text-slate-600 mt-0.5">Verified Expert Knowledge Contributor</span>
+                </div>
+                
+                {identity && identity.id !== ko.authorId && (
+                  <div className="flex flex-col items-start sm:items-end gap-2.5 w-full sm:w-auto">
+                    <button
+                      onClick={handleFollowToggle}
+                      disabled={isFollowLoading}
+                      className={`font-bold transition-all px-6 py-2.5 rounded-xl text-sm w-full sm:w-auto ${
+                        isFollowing
+                           ? 'bg-slate-200 hover:bg-slate-300 text-slate-800'
+                           : 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm'
+                      }`}
+                    >
+                      {isFollowLoading ? '...' : isFollowing ? 'Following' : 'Follow Author'}
+                    </button>
+                    {isFollowing && (
+                      <label className="flex items-center gap-2 cursor-pointer text-[10px] uppercase font-bold text-slate-500">
+                        <input
+                          type="checkbox"
+                          checked={notifyAll}
+                          onChange={(e) => handleNotifyAllToggle(e.target.checked)}
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        Notify on new posts
+                      </label>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             
             {/* Sidebar Data */}
@@ -821,16 +828,16 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
             </h2>
             
             {[
-              { format: 'APA', content: `${ko.authorId === 'id_org_1' ? 'OpenAI' : 'Alice Developer'}. (${new Date(ko.updatedAt).getFullYear()}). ${ko.title}. SOTYAI Knowledge Platform. Retrieved from https://sotyai.network/knowledge/${ko.id}` },
-              { format: 'MLA', content: `${ko.authorId === 'id_org_1' ? 'OpenAI' : 'Developer, Alice'}. "${ko.title}." SOTYAI Knowledge Platform, ${new Date(ko.updatedAt).toLocaleDateString()}, https://sotyai.network/knowledge/${ko.id}.` },
+              { format: 'APA', content: `${ko.authorId === 'id_org_1' ? 'OpenAI' : 'Alice Developer'}. (${new Date(ko.updatedAt).getFullYear()}). ${ko.title}. SOTYAI Knowledge Platform. Retrieved from https://sotyai.com/knowledge/${ko.id}` },
+              { format: 'MLA', content: `${ko.authorId === 'id_org_1' ? 'OpenAI' : 'Developer, Alice'}. "${ko.title}." SOTYAI Knowledge Platform, ${new Date(ko.updatedAt).toLocaleDateString()}, https://sotyai.com/knowledge/${ko.id}.` },
               { format: 'BibTeX', content: `@misc{sotyai_${ko.id},
   author = {${ko.authorId === 'id_org_1' ? 'OpenAI' : 'Alice Developer'}},
   title = {${ko.title}},
   year = {${new Date(ko.updatedAt).getFullYear()}},
-  url = {https://sotyai.network/knowledge/${ko.id}},
+  url = {https://sotyai.com/knowledge/${ko.id}},
   note = {SOTYAI Human-AI Knowledge Platform}
 }` },
-              { format: 'Markdown', content: `[${ko.title}](https://sotyai.network/knowledge/${ko.id}) by ${ko.authorId === 'id_org_1' ? 'OpenAI' : 'Alice Developer'}` }
+              { format: 'Markdown', content: `[${ko.title}](https://sotyai.com/knowledge/${ko.id}) by ${ko.authorId === 'id_org_1' ? 'OpenAI' : 'Alice Developer'}` }
             ].map(citation => (
               <div key={citation.format} className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
                 <div className="bg-slate-100 px-4 py-2 border-b border-slate-200 flex justify-between items-center">
@@ -843,7 +850,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
                   </button>
                 </div>
                 <div className="p-4">
-                  <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans">{citation.content}</pre>
+                  <pre className="text-sm text-slate-700 whitespace-pre-wrap break-all sm:break-words font-sans">{citation.content}</pre>
                 </div>
               </div>
             ))}
@@ -888,16 +895,17 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
             </div>
           </div>
 
-          <div className="p-4 overflow-x-auto">
-            {/* JSON TAB */}
-            {activeAiTab === 'json' && (
-              <pre className="text-green-400">
+          <ScrollWrapper className="bg-[#0D1117] rounded-b-2xl border-t border-slate-800">
+            <div className="p-4">
+              {/* JSON TAB */}
+              {activeAiTab === 'json' && (
+              <pre className="text-green-400 whitespace-pre-wrap break-all sm:break-words">
                 {JSON.stringify({
                   _metadata: {
                     canonical_id: ko.id,
                     rendered_for: 'AI Agent',
                     format: 'application/vnd.sotyai.ai+json',
-                    schema: 'https://sotyai.network/schemas/knowledge-v1.json',
+                    schema: 'https://sotyai.com/schemas/knowledge-v1.json',
                     confidence_score: ko.trustScore.overall / 100,
                     version: ko.version,
                     updated_at: ko.updatedAt
@@ -909,7 +917,7 @@ export default function KnowledgeDetail({ identity }: KnowledgeDetailProps) {
 
             {/* MARKDOWN TAB */}
             {activeAiTab === 'markdown' && (
-              <pre className="text-slate-300 whitespace-pre-wrap">
+              <pre className="text-slate-300 whitespace-pre-wrap break-all sm:break-words">
 {`---
 id: ${ko.id}
 title: ${ko.title}
@@ -954,7 +962,7 @@ ${ko.conclusion || ko.result}
 
             {/* MCP SCHEME TAB */}
             {activeAiTab === 'mcp' && (
-              <pre className="text-blue-400">
+              <pre className="text-blue-400 whitespace-pre-wrap break-all sm:break-words">
                 {JSON.stringify({
                   mcp_version: '1.0.0',
                   resource_uri: `mcp://sotyai/knowledge/${ko.id}`,
@@ -972,7 +980,8 @@ ${ko.conclusion || ko.result}
                 }, null, 2)}
               </pre>
             )}
-          </div>
+            </div>
+          </ScrollWrapper>
         </div>
       )}
 

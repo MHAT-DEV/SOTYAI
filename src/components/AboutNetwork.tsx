@@ -688,21 +688,35 @@ export default function AboutNetwork() {
       className="space-y-12 max-w-5xl mx-auto pb-16 px-1 sm:px-4"
     >
       {/* Hero Section */}
-      <div className="relative text-center py-10 sm:py-14 px-4 bg-gradient-to-br from-slate-900 to-indigo-950 rounded-3xl overflow-hidden shadow-lg border border-indigo-900/50">
+      <div className="relative text-center py-12 sm:py-16 px-4 bg-gradient-to-br from-slate-900 via-indigo-900 to-indigo-950 rounded-3xl overflow-hidden shadow-lg border border-indigo-900/50">
         <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl -mr-20 -mt-20"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl -ml-20 -mb-20"></div>
         
-        <div className="relative z-10 max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/15 border border-indigo-400/25 text-indigo-200 text-xs font-bold uppercase tracking-wider rounded-full">
+        <div className="relative z-10 max-w-3xl mx-auto space-y-5">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/15 border border-indigo-400/25 text-indigo-200 text-xs font-bold uppercase tracking-wider rounded-full shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-            <span>Verifiable Knowledge Graph</span>
+            <span>Human-AI Knowledge Platform (HAKP) Network</span>
           </div>
-          <h1 id="about-hero-title" className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-none font-sans">
-            {content.title}
+          <h1 id="about-hero-title" className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-none font-sans drop-shadow-sm">
+            SOTYAI
           </h1>
-          <p className="text-sm sm:text-base text-indigo-100 max-w-2xl mx-auto font-medium leading-relaxed">
-            {content.subtitle}
+          <p className="text-base sm:text-lg text-indigo-200 max-w-2xl mx-auto font-medium leading-relaxed italic">
+            "Write Once. Read by Humans and AI."
           </p>
+          
+          <div className="bg-slate-900/40 border border-indigo-500/30 rounded-2xl p-5 sm:p-6 mt-8 max-w-2xl mx-auto backdrop-blur-md shadow-inner text-left">
+            <h3 className="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4" /> Mission
+            </h3>
+            <p className="text-white text-sm md:text-base font-medium leading-relaxed">
+               สร้างองค์ความรู้ที่ทั้งมนุษย์และ AI Agent สามารถเขียน อ่าน อ้างอิง และตรวจสอบร่วมกันได้
+            </p>
+            <div className="mt-4 flex items-center justify-between border-t border-indigo-500/20 pt-4">
+               <a href="https://sotyai.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-indigo-300 hover:text-white transition-colors text-sm font-bold">
+                 sotyai.com <Sparkles className="w-3 h-3" />
+               </a>
+            </div>
+          </div>
         </div>
       </div>
 

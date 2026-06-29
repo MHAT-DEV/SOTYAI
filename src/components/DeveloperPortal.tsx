@@ -8,12 +8,13 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { ScrollWrapper } from './ScrollWrapper';
 
 export default function DeveloperPortal() {
   const [identity, setIdentity] = useState<Identity | null>(null);
   const [aiAgents, setAiAgents] = useState<Identity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'api' | 'mcp' | 'agents' | 'webhooks' | 'explorer' | 'sdk'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'api' | 'mcp' | 'agents' | 'webhooks' | 'explorer' | 'sdk' | 'docs'>('dashboard');
   
   // State for Webhooks
   const [webhooks, setWebhooks] = useState<any[]>([]);
@@ -239,7 +240,7 @@ import { SotyAiClient } from '@sotyai/sdk';
 
 const client = new SotyAiClient({
   apiKey: 'sk_live_...a8f2',
-  endpoint: 'https://sotyai.network/api/v2'
+  endpoint: 'https://sotyai.com/api/v2'
 });
 
 // Search knowledge graph with cross-language semantic capabilities
@@ -255,7 +256,7 @@ from sotyai import SotyAiClient
 
 client = SotyAiClient(
     api_key="sk_live_...a8f2",
-    endpoint="https://sotyai.network/api/v2"
+    endpoint="https://sotyai.com/api/v2"
 )
 
 # Search knowledge graph with trust score sorting
@@ -290,7 +291,7 @@ func main() {
     fmt.Println("MCP response:", mcpOutput)
 }`;
       default:
-        return `curl -X GET "https://sotyai.network/api/v2/search?q=ESP32&type=semantic" \\
+        return `curl -X GET "https://sotyai.com/api/v2/search?q=ESP32&type=semantic" \\
   -H "Authorization: Bearer valid_human_jwt_token" \\
   -H "x-api-key: sk_live_...a8f2" \\
   -H "Accept: application/json"`;
@@ -381,9 +382,9 @@ func main() {
             <p className="text-xs text-blue-800 mt-2 leading-relaxed">
               Integrate human-curated context and automated AI consensus loops directly into your CI/CD pipelines.
             </p>
-            <a href="#" className="text-xs font-bold text-blue-600 mt-3 inline-flex items-center gap-1 hover:underline">
+            <button onClick={() => setActiveTab('docs')} className="text-xs font-bold text-blue-600 mt-3 inline-flex items-center gap-1 hover:underline">
               View OpenAPI Spec &rarr;
-            </a>
+            </button>
           </div>
         </div>
 
@@ -463,32 +464,34 @@ func main() {
                 <div className="bg-slate-50 px-5 py-3 border-b border-slate-200">
                   <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Gateway Route Distribution</h3>
                 </div>
-                <div className="divide-y divide-slate-100 text-sm">
-                  <div className="px-5 py-3.5 flex justify-between items-center hover:bg-slate-50">
-                    <span className="font-mono text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold">GET</span>
-                    <span className="font-semibold text-slate-800 flex-1 ml-4">/api/v2/search</span>
-                    <span className="text-slate-500 font-mono text-xs">65,000 requests</span>
-                    <span className="text-xs font-bold text-slate-900 ml-6 bg-slate-100 px-2 py-1 rounded">26.5%</span>
+                <ScrollWrapper>
+                  <div className="divide-y divide-slate-100 text-sm min-w-[500px]">
+                    <div className="px-5 py-3.5 flex justify-between items-center hover:bg-slate-50">
+                      <span className="font-mono text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold">GET</span>
+                      <span className="font-semibold text-slate-800 flex-1 ml-4 whitespace-nowrap">/api/v2/search</span>
+                      <span className="text-slate-500 font-mono text-xs whitespace-nowrap">65,000 requests</span>
+                      <span className="text-xs font-bold text-slate-900 ml-6 bg-slate-100 px-2 py-1 rounded whitespace-nowrap">26.5%</span>
+                    </div>
+                    <div className="px-5 py-3.5 flex justify-between items-center hover:bg-slate-50">
+                      <span className="font-mono text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold">GET</span>
+                      <span className="font-semibold text-slate-800 flex-1 ml-4 whitespace-nowrap">/api/v2/knowledge</span>
+                      <span className="text-slate-500 font-mono text-xs whitespace-nowrap">98,000 requests</span>
+                      <span className="text-xs font-bold text-slate-900 ml-6 bg-slate-100 px-2 py-1 rounded whitespace-nowrap">40.0%</span>
+                    </div>
+                    <div className="px-5 py-3.5 flex justify-between items-center hover:bg-slate-50">
+                      <span className="font-mono text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded font-bold">POST</span>
+                      <span className="font-semibold text-slate-800 flex-1 ml-4 whitespace-nowrap">/api/v2/mcp/call</span>
+                      <span className="text-slate-500 font-mono text-xs whitespace-nowrap">36,000 requests</span>
+                      <span className="text-xs font-bold text-slate-900 ml-6 bg-slate-100 px-2 py-1 rounded whitespace-nowrap">14.7%</span>
+                    </div>
+                    <div className="px-5 py-3.5 flex justify-between items-center hover:bg-slate-50">
+                      <span className="font-mono text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded font-bold">POST</span>
+                      <span className="font-semibold text-slate-800 flex-1 ml-4 whitespace-nowrap">/api/v2/auth/login</span>
+                      <span className="text-slate-500 font-mono text-xs whitespace-nowrap">46,000 requests</span>
+                      <span className="text-xs font-bold text-slate-900 ml-6 bg-slate-100 px-2 py-1 rounded whitespace-nowrap">18.8%</span>
+                    </div>
                   </div>
-                  <div className="px-5 py-3.5 flex justify-between items-center hover:bg-slate-50">
-                    <span className="font-mono text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold">GET</span>
-                    <span className="font-semibold text-slate-800 flex-1 ml-4">/api/v2/knowledge</span>
-                    <span className="text-slate-500 font-mono text-xs">98,000 requests</span>
-                    <span className="text-xs font-bold text-slate-900 ml-6 bg-slate-100 px-2 py-1 rounded">40.0%</span>
-                  </div>
-                  <div className="px-5 py-3.5 flex justify-between items-center hover:bg-slate-50">
-                    <span className="font-mono text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded font-bold">POST</span>
-                    <span className="font-semibold text-slate-800 flex-1 ml-4">/api/v2/mcp/call</span>
-                    <span className="text-slate-500 font-mono text-xs">36,000 requests</span>
-                    <span className="text-xs font-bold text-slate-900 ml-6 bg-slate-100 px-2 py-1 rounded">14.7%</span>
-                  </div>
-                  <div className="px-5 py-3.5 flex justify-between items-center hover:bg-slate-50">
-                    <span className="font-mono text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded font-bold">POST</span>
-                    <span className="font-semibold text-slate-800 flex-1 ml-4">/api/v2/auth/login</span>
-                    <span className="text-slate-500 font-mono text-xs">46,000 requests</span>
-                    <span className="text-xs font-bold text-slate-900 ml-6 bg-slate-100 px-2 py-1 rounded">18.8%</span>
-                  </div>
-                </div>
+                </ScrollWrapper>
               </div>
             </div>
           )}
@@ -595,11 +598,11 @@ func main() {
                 {/* Panel 2: Response output */}
                 <div className="flex flex-col h-full min-h-[350px]">
                   <label className="block text-xs font-bold text-slate-600 uppercase mb-2">API Response</label>
-                  <div className="flex-1 bg-slate-950 rounded-xl p-4 border border-slate-800 overflow-auto font-mono text-xs text-green-400 max-h-[420px]">
+                  <div className="flex-1 bg-slate-950 rounded-xl p-4 border border-slate-800 overflow-y-auto font-mono text-xs text-green-400 max-h-[420px]">
                     {explorerLoading ? (
                       <div className="text-slate-400 animate-pulse">Requesting node gateway server...</div>
                     ) : explorerResponse ? (
-                      <pre>{JSON.stringify(explorerResponse, null, 2)}</pre>
+                      <pre className="whitespace-pre-wrap break-all sm:break-words">{JSON.stringify(explorerResponse, null, 2)}</pre>
                     ) : (
                       <div className="text-slate-600 italic">No request sent yet. Click "Send API Request" to execute live.</div>
                     )}
@@ -630,9 +633,10 @@ func main() {
                   <button onClick={handleGenerateKey} className="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50">Generate Key</button>
                 </div>
               ) : (
-                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-slate-50 border-b border-slate-200 text-slate-600">
+                <div className="bg-white border border-slate-200 rounded-xl shadow-sm">
+                  <ScrollWrapper>
+                    <table className="w-full min-w-[800px] text-left text-sm">
+                      <thead className="bg-slate-50 border-b border-slate-200 text-slate-600">
                       <tr>
                         <th className="px-5 py-3 font-semibold">Name</th>
                         <th className="px-5 py-3 font-semibold">Key Preview</th>
@@ -674,7 +678,8 @@ func main() {
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                    </table>
+                  </ScrollWrapper>
                 </div>
               )}
             </div>
@@ -696,7 +701,7 @@ func main() {
 
               <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 text-xs font-mono text-slate-300">
                 <div><span className="text-purple-400"># mcp-config.json configuration</span></div>
-                <pre className="mt-2 text-slate-200">
+                <pre className="mt-2 text-slate-200 whitespace-pre-wrap break-all sm:break-words">
 {`{
   "mcpServers": {
     "sotyai-consensus-hub": {
@@ -704,7 +709,7 @@ func main() {
       "args": ["-y", "@sotyai/mcp-server"],
       "env": {
         "SOTYAI_API_KEY": "sk_live_...a8f2",
-        "SOTYAI_GATEWAY_URL": "https://sotyai.network/api/v2"
+        "SOTYAI_GATEWAY_URL": "https://sotyai.com/api/v2"
       }
     }
   }
@@ -855,8 +860,8 @@ func main() {
                     )}
                   </button>
                 </div>
-                <div className="bg-slate-950 text-slate-200 p-5 rounded-xl border border-slate-900 font-mono text-xs overflow-auto max-h-[380px] leading-relaxed">
-                  <pre>{getSdkSnippet()}</pre>
+                <div className="bg-slate-950 text-slate-200 p-5 rounded-xl border border-slate-900 font-mono text-xs leading-relaxed">
+                  <pre className="whitespace-pre-wrap break-all sm:break-words">{getSdkSnippet()}</pre>
                 </div>
               </div>
             </div>
@@ -922,9 +927,10 @@ func main() {
 
                 {/* Webhook subscriptions table */}
                 {webhooks.length > 0 && (
-                  <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                    <table className="w-full text-left text-sm">
-                      <thead className="bg-slate-50 border-b border-slate-200 text-slate-600">
+                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm">
+                    <ScrollWrapper>
+                      <table className="w-full min-w-[800px] text-left text-sm">
+                        <thead className="bg-slate-50 border-b border-slate-200 text-slate-600">
                         <tr>
                           <th className="px-5 py-3 font-semibold">Name</th>
                           <th className="px-5 py-3 font-semibold">Target URL</th>
@@ -952,7 +958,8 @@ func main() {
                           </tr>
                         ))}
                       </tbody>
-                    </table>
+                      </table>
+                    </ScrollWrapper>
                   </div>
                 )}
               </div>
@@ -981,6 +988,72 @@ func main() {
                       </div>
                     ))
                   )}
+                </div>
+              </div>
+            </div>
+          )}
+          {/* TAB 8: API DOCUMENTATION (DOCS) */}
+          {activeTab === 'docs' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-indigo-600" /> API Documentation V2 (OpenAPI Spec)
+                </h2>
+                <p className="text-slate-500 text-sm mt-1">
+                  Complete technical reference for SOTYAI REST endpoints. Use API Keys to authenticate standard HTTPS requests.
+                </p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 font-bold text-slate-800">
+                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs mr-2">GET</span> /api/v2/knowledge
+                  </div>
+                  <div className="p-4 bg-white space-y-3">
+                    <p className="text-sm text-slate-600">Retrieves a paginated list of fully verified knowledge objects from the global graph.</p>
+                    <div className="bg-slate-950 text-slate-300 p-3 rounded font-mono text-xs">
+                      curl -X GET "https://sotyai.com/api/v2/knowledge?limit=10" -H "x-api-key: YOUR_KEY"
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 font-bold text-slate-800">
+                    <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs mr-2">POST</span> /api/v2/knowledge
+                  </div>
+                  <div className="p-4 bg-white space-y-3">
+                    <p className="text-sm text-slate-600">Submits a new knowledge object proposal to the SOTYAI verification queue. Requires dual-consensus before becoming active.</p>
+                    <div className="bg-slate-950 text-slate-300 p-3 rounded font-mono text-xs">
+                      curl -X POST "https://sotyai.com/api/v2/knowledge" \<br/>
+                      -H "x-api-key: YOUR_KEY" \<br/>
+                      -H "Content-Type: application/json" \<br/>
+                      -d '{"{"}"title": "Example", "problem": "...", "solution": "..."{"}"}'
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 font-bold text-slate-800">
+                    <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs mr-2">GET</span> /api/v2/search
+                  </div>
+                  <div className="p-4 bg-white space-y-3">
+                    <p className="text-sm text-slate-600">Performs semantic vector search across the entire knowledge base to find highly trusted solutions.</p>
+                    <div className="bg-slate-950 text-slate-300 p-3 rounded font-mono text-xs">
+                      curl -X GET "https://sotyai.com/api/v2/search?q=memory+leak&type=semantic" -H "x-api-key: YOUR_KEY"
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 font-bold text-slate-800">
+                    <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs mr-2">GET</span> /api/v2/mcp/tools
+                  </div>
+                  <div className="p-4 bg-white space-y-3">
+                    <p className="text-sm text-slate-600">List available Model Context Protocol (MCP) tools that external AI agents can use to read/write to SOTYAI.</p>
+                    <div className="bg-slate-950 text-slate-300 p-3 rounded font-mono text-xs">
+                      curl -X GET "https://sotyai.com/api/v2/mcp/tools" -H "x-api-key: YOUR_KEY"
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

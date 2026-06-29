@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import ReportModal from './ReportModal';
+import { ScrollWrapper } from './ScrollWrapper';
 
 interface FullMessengerProps {
   identity: Identity | null;
@@ -521,16 +522,20 @@ export default function FullMessenger({ identity }: FullMessengerProps) {
             </div>
 
             {/* Quick replies */}
-            <div className="px-4 py-2 border-t border-slate-100 bg-white overflow-x-auto flex gap-2 shrink-0 scrollbar-none">
-              {quickReplies.map((reply, i) => (
-                <button
-                  key={i}
-                  onClick={(e) => handleSendMessage(e, reply)}
-                  className="px-3 py-1 bg-slate-100 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 text-slate-600 hover:text-blue-700 text-[10px] font-semibold rounded-full shrink-0 transition-all cursor-pointer"
-                >
-                  {reply}
-                </button>
-              ))}
+            <div className="border-t border-slate-100 bg-white shrink-0">
+              <ScrollWrapper className="px-4 py-2">
+                <div className="flex gap-2 w-max">
+                  {quickReplies.map((reply, i) => (
+                    <button
+                      key={i}
+                      onClick={(e) => handleSendMessage(e, reply)}
+                      className="px-3 py-1 bg-slate-100 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 text-slate-600 hover:text-blue-700 text-[10px] font-semibold rounded-full shrink-0 transition-all cursor-pointer"
+                    >
+                      {reply}
+                    </button>
+                  ))}
+                </div>
+              </ScrollWrapper>
             </div>
 
             {/* Chat Input form area */}

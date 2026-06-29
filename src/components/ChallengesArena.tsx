@@ -19,6 +19,7 @@ import {
   ChevronRight,
   PlusCircle
 } from 'lucide-react';
+import { ScrollWrapper } from './ScrollWrapper';
 
 interface ChallengesArenaProps {
   identity: Identity | null;
@@ -504,8 +505,10 @@ export default function ChallengesArena({ identity }: ChallengesArenaProps) {
                             </span>
                           </div>
 
-                          <div className="bg-slate-950 text-emerald-400 p-3 rounded-lg font-mono text-[10px] overflow-x-auto whitespace-pre leading-relaxed border border-slate-850">
-                            {sub.codeSolution}
+                          <div className="bg-slate-950 rounded-lg border border-slate-850">
+                            <div className="text-emerald-400 p-3 font-mono text-[10px] whitespace-pre-wrap break-all sm:break-words leading-relaxed">
+                              {sub.codeSolution}
+                            </div>
                           </div>
 
                           <div className="space-y-1">

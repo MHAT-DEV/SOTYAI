@@ -712,7 +712,7 @@ async function startServer() {
          return res.json({
            _metadata: {
              type: 'KnowledgeObject',
-             canonicalUrl: `https://sotyai.network/knowledge/${ko.id}`,
+             canonicalUrl: `https://sotyai.com/knowledge/${ko.id}`,
              renderedFor: 'AI Agent',
              format: 'application/vnd.sotyai.ai+json',
              timestamp: new Date().toISOString()
